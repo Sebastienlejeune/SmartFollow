@@ -1,0 +1,17 @@
+SmartFollow
+Copyright (c) 2026 Sébastien Lejeune
+Licensed under the MIT License (see LICENSE).
+
+This project includes third-party material:
+
+- Material Design icons by Google, licensed under the Apache License, Version 2.0
+  (https://www.apache.org/licenses/LICENSE-2.0), https://github.com/google/material-design-icons.
+  The path data of these vector drawables comes from them:
+  app/src/main/res/drawable/ic_cloud.xml, ic_more_horiz.xml, ic_notifications_off.xml,
+  ic_smartphone.xml and ic_volume_up.xml.
+
+The Dexcom Share protocol implemented in `data-share` follows the documentation of pydexcom
+(https://github.com/gagebenne/pydexcom); no code is copied from it.
+
+Libraries used at build or run time (Kotlin, Ktor, AndroidX, Jetpack Compose, kotlinx) keep
+their own licenses, distributed with them.

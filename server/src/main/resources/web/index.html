@@ -1,0 +1,899 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SmartFollow">
+<meta name="theme-color" content="#111418">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>SmartFollow</title>
+<!--
+  Mirror of the Android app (monitoring, history and statistics pages): keep both identical in
+  behaviour. Only phone-specific features stay in the app (alarm sound, settings, Dexcom account);
+  the choice of ntfy notifications is only here, ntfy being the iPhone's alarm channel.
+-->
+<style>
+  :root {
+    --bg: #f4f6f8; --card: #ffffff; --text: #15191e; --muted: #6b7480; --line: #dde2e7;
+    --accent: #00897b; --danger: #d32f2f; --danger-bg: #fde7e7;
+    --out: #e53935; --near: #fb8c00; --range: #43a047; --band: rgba(0, 137, 123, 0.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111418; --card: #1b2026; --text: #eef1f4; --muted: #8d96a1; --line: #2b323a;
+      --accent: #26a69a; --danger: #ef5350; --danger-bg: #3a1d1f; --band: rgba(38, 166, 154, 0.14);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+  }
+  main { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+  .page { display: flex; flex-direction: column; gap: 14px; }
+  .card { background: var(--card); border-radius: 16px; padding: 16px; }
+  .center { text-align: center; }
+  .value { font-size: 88px; font-weight: 700; line-height: 1; white-space: nowrap; }
+  .arrow { font-size: 64px; margin-left: 10px; }
+  .unit, .muted { color: var(--muted); }
+  .small { font-size: 13px; }
+  h2 { margin: 0; font-size: 24px; font-weight: 600; }
+  h3 { margin: 0 0 10px; font-size: 17px; font-weight: 600; }
+  .banner { background: var(--danger-bg); color: var(--danger); display: flex; align-items: center; gap: 12px; }
+  .banner strong { flex: 1; font-size: 18px; }
+  button {
+    font: inherit; border: 0; border-radius: 12px; padding: 12px 16px; cursor: pointer;
+    background: var(--line); color: var(--text);
+  }
+  button.primary { background: var(--accent); color: #fff; width: 100%; font-size: 20px; padding: 20px; }
+  button.danger { background: var(--danger); color: #fff; }
+  button.link { background: none; padding: 8px 4px; color: var(--muted); }
+  .row { display: flex; align-items: center; gap: 12px; }
+  .row > span { flex: 1; }
+  .buttons { display: flex; gap: 8px; }
+  .segments { display: flex; gap: 6px; }
+  .segments button { flex: 1; padding: 8px 0; }
+  .segments button.active { background: var(--accent); color: #fff; }
+  .tabs { display: flex; align-items: center; gap: 6px; }
+  .tabs button { flex: 1; padding: 10px 0; background: none; border-bottom: 3px solid transparent; border-radius: 0; color: var(--muted); }
+  .tabs button.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .bar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }
+  .bar .link { justify-self: start; }
+  .bar .end { justify-self: end; font-size: 20px; }
+  #profile { font-size: 17px; }
+  #chart { width: 100%; height: 220px; display: block; touch-action: none; margin-top: 8px; }
+  .labels { position: relative; height: 16px; color: var(--muted); font-size: 12px; }
+  .labels span { position: absolute; top: 0; white-space: nowrap; }
+  .day { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; margin: 12px 0 6px; padding-bottom: 6px; border-bottom: 1px solid var(--line); cursor: pointer; user-select: none; }
+  .day .title { flex: 1; font-size: 17px; font-weight: 600; }
+  .day .count { color: var(--muted); }
+  .day .summary { flex-basis: 100%; padding-left: 26px; color: var(--muted); font-size: 13px; }
+  .weekday { color: var(--muted); font-size: 13px; font-weight: 600; margin: 10px 0 0; }
+  .chevron { display: inline-block; width: 18px; text-align: center; font-size: 22px; line-height: 1; transition: transform 0.15s; }
+  .chevron.open { transform: rotate(90deg); }
+  ol { list-style: none; margin: 0; padding: 0; }
+  li { display: flex; gap: 12px; padding: 9px 0; align-items: center; }
+  li .time { color: var(--muted); width: 48px; flex: none; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  li .label { flex: 1; }
+  .detail { display: block; color: var(--muted); font-size: 13px; }
+  .detail.warn { color: var(--danger); }
+  label.toggle { display: flex; align-items: center; gap: 12px; padding: 10px 0; cursor: pointer; }
+  label.toggle > span { flex: 1; }
+  li .glucose { font-weight: 700; }
+  .stack { display: flex; height: 28px; border-radius: 4px; overflow: hidden; margin-bottom: 6px; }
+  .metric { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+  .metric > div:first-of-type { flex: 1; }
+  .metric .figure { font-size: 17px; font-weight: 700; text-align: right; }
+  input { font: inherit; width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+  input[type=checkbox] { width: 24px; height: 24px; flex: none; padding: 0; accent-color: var(--accent); }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <section id="login" class="card" hidden>
+    <h2 data-t="loginTitle"></h2>
+    <p class="muted" data-t="loginHelp"></p>
+    <form id="loginForm" class="row">
+      <input id="tokenInput" type="password" autocomplete="off">
+      <button type="submit" data-t="loginButton"></button>
+    </form>
+  </section>
+
+  <div id="app" class="page" hidden>
+    <header class="bar">
+      <button class="link" id="signOut" data-t="signOut"></button>
+      <strong id="profile"></strong>
+      <button class="link end" id="openNotifications" data-tab="notifications">🔔</button>
+    </header>
+    <nav class="tabs">
+      <button data-tab="monitor" data-t="tabMonitor"></button>
+      <button data-tab="history" data-t="tabHistory"></button>
+      <button data-tab="statistics" data-t="tabStatistics"></button>
+    </nav>
+
+    <div id="monitor" class="page">
+      <section id="stoppedBanner" class="card banner" hidden><strong data-t="stoppedBanner"></strong></section>
+
+      <section class="card center">
+        <div><span id="value" class="value">—</span><span id="arrow" class="arrow"></span></div>
+        <div class="unit">mg/dL</div>
+        <div id="age"></div>
+        <div id="rate" class="muted small"></div>
+      </section>
+
+      <section id="alarm" class="card banner" hidden>
+        <strong id="alarmLabel"></strong>
+        <button class="danger" data-action="ACKNOWLEDGED">OK</button>
+      </section>
+
+      <section class="card">
+        <div class="segments" id="ranges"></div>
+        <canvas id="chart"></canvas>
+        <div class="labels" id="labels"></div>
+      </section>
+
+      <section id="snooze" class="card row" hidden>
+        <span id="snoozeLabel"></span>
+        <button data-action="RESUGARING_CANCELLED" data-t="cancel"></button>
+      </section>
+      <button id="resugar" class="primary" data-action="RESUGARING" data-t="resugaring"></button>
+
+      <p id="error" class="small" style="color: var(--danger); margin: 0" hidden></p>
+      <p id="lastFetch" class="small muted" style="margin: 0"></p>
+      <div class="buttons"><button id="refresh" data-t="refresh"></button></div>
+      <p id="waiting" class="small" style="margin: 0" data-t="waiting" hidden></p>
+    </div>
+
+    <div id="history" class="page" hidden>
+      <p id="historyEmpty" data-t="historyEmpty" hidden></p>
+      <div id="days"></div>
+    </div>
+
+    <div id="statistics" class="page" hidden>
+      <h2 data-t="tabStatistics"></h2>
+      <div class="segments" id="periods"></div>
+      <p id="statsEmpty" data-t="statsNoData" hidden></p>
+      <div id="statsCards" class="page"></div>
+      <p class="small muted" style="margin: 0" data-t="statsNote"></p>
+      <button id="export" data-t="exportCsv"></button>
+      <p id="exportResult" class="small" style="margin: 0"></p>
+    </div>
+
+    <div id="notifications" class="page" hidden>
+      <h2 data-t="notifTitle"></h2>
+      <section class="card"><h3 data-t="notifAlarms"></h3><div id="notifAlarms"></div></section>
+      <section class="card"><h3 data-t="notifOther"></h3><div id="notifOther"></div></section>
+      <p id="notifResult" class="small" style="margin: 0; color: var(--danger)"></p>
+    </div>
+  </div>
+</main>
+
+<script>
+"use strict";
+const FR = navigator.language.toLowerCase().startsWith("fr");
+const LOCALE = FR ? "fr-FR" : "en-GB";
+const T = FR ? {
+  loginTitle: "Connexion", loginHelp: "Collez le jeton d'accès du serveur SmartFollow.", loginButton: "Valider",
+  signOut: "Déconnexion", signOutConfirm: "Se déconnecter ? Le jeton est retiré de ce téléphone ; les notifications ntfy continuent.",
+  tabMonitor: "Suivi", tabHistory: "Historique", tabStatistics: "Statistiques",
+  resugaring: "Resucrage effectué", cancel: "Annuler", refresh: "Actualiser",
+  ago: m => `il y a ${m} min`, snooze: m => `Snooze resucrage : encore ${m} min`,
+  stoppedBanner: "Surveillance arrêtée : aucune alarme", waiting: "En attente de la première mesure…",
+  lastFetch: t => `Dernière mise à jour : ${t}`, rate: r => `${r} mg/dL/min`,
+  alarms: { URGENT_LOW: "Hypo sévère", FAST_DROP: "Chute rapide", NO_RECOVERY: "Pas de remontée après resucrage", LOW: "Hypo", LOW_SOON: "Hypo imminente", STALE_DATA: "Pas de données", URGENT_HIGH: "Hyper sévère", HIGH: "Hyper" },
+  started: a => `${a} : début`, ended: a => `${a} : fin`, dataLost: "Perte des données", dataBack: "Données rétablies",
+  rang: a => `Alarme : ${a}`, ack: "OK appuyé", ackType: a => `OK appuyé : ${a}`, resugared: "Resucrage", cancelled: "Resucrage annulé",
+  snoozeEnded: "Fin du snooze resucrage", monStarted: "Surveillance démarrée", monStopped: "Surveillance arrêtée",
+  profileChanged: p => `Profil ${p} activé`,
+  until: (t, d) => `jusqu'à ${t} (${d})`, ongoing: "en cours", alarmCount: n => `${n} ${n <= 1 ? "alarme" : "alarmes"}`,
+  sources: { android: "app Android", web: "page web", ntfy: "notification" }, unauthorized: "Jeton refusé.",
+  today: "Aujourd'hui", yesterday: "Hier", week: d => `Semaine du ${d}`, weekEmpty: "Aucune alarme ni resucrage",
+  historyEmpty: "Aucun événement pour l'instant. Les franchissements de seuil, alarmes et resucrages s'afficheront ici.",
+  periods: ["24h", "7j", "14j", "30j", "90j"], statsNoData: "Pas encore de mesure sur cette période.",
+  timeInRanges: "Temps dans les plages", perDay: (h, m) => `${h} h ${String(m).padStart(2, "0")} / jour`,
+  ranges: ["Très haut", "Haut", "Dans la cible", "Bas", "Très bas"],
+  targets: ["objectif sous 5 %", "objectif sous 25 % avec très haut", "objectif au-dessus de 70 %", "objectif sous 4 % avec très bas", "objectif sous 1 %"],
+  glucose: "Glycémie", mean: "Glycémie moyenne", gmi: "HbA1c estimée (GMI)", cv: "Variabilité (CV)", cvTarget: "objectif 36 % ou moins",
+  sd: "Écart-type", data: "Données", coverage: "Données capteur reçues", coverageTarget: "au moins 70 % pour des statistiques fiables",
+  readings: "Mesures", since: "Première mesure de la période",
+  statsNote: "Plages standard du consensus international, comme dans Dexcom Clarity, indépendantes des seuils d'alarme. Les mesures sont conservées 90 jours sur le serveur, depuis l'installation de cette version : Dexcom Share ne fournit que les dernières 24 heures.",
+  exportCsv: "Exporter les mesures (CSV)", exported: n => `${n} ${n <= 1 ? "mesure exportée" : "mesures exportées"}.`, exportFailed: e => `Échec de l'export : ${e}`,
+  notifTitle: "Notifications",
+  notifAlarms: "Alarmes", notifOther: "Autres", notifActions: "Resucrage ou annulation faits ailleurs", notifNight: "Résumé de la nuit",
+  notifUrgentWarning: "Désactivée : aucune notification d'hypo sévère sur ce téléphone.", notifFailed: e => `Échec de l'enregistrement : ${e}`,
+} : {
+  loginTitle: "Sign in", loginHelp: "Paste the access token of the SmartFollow server.", loginButton: "OK",
+  signOut: "Sign out", signOutConfirm: "Sign out? The token is removed from this phone; ntfy notifications go on.",
+  tabMonitor: "Monitoring", tabHistory: "History", tabStatistics: "Statistics",
+  resugaring: "Resugaring done", cancel: "Cancel", refresh: "Refresh",
+  ago: m => `${m} min ago`, snooze: m => `Resugaring snooze: ${m} min left`,
+  stoppedBanner: "Monitoring stopped: no alarm will ring", waiting: "Waiting for the first reading…",
+  lastFetch: t => `Last update: ${t}`, rate: r => `${r} mg/dL/min`,
+  alarms: { URGENT_LOW: "Urgent low", FAST_DROP: "Dropping fast", NO_RECOVERY: "Not rising after resugaring", LOW: "Low", LOW_SOON: "Low soon", STALE_DATA: "No data", URGENT_HIGH: "Urgent high", HIGH: "High" },
+  started: a => `${a}: start`, ended: a => `${a}: end`, dataLost: "Data lost", dataBack: "Data back",
+  rang: a => `Alarm: ${a}`, ack: "OK pressed", ackType: a => `OK pressed: ${a}`, resugared: "Resugaring", cancelled: "Resugaring cancelled",
+  snoozeEnded: "Resugaring snooze ended", monStarted: "Monitoring started", monStopped: "Monitoring stopped",
+  profileChanged: p => `Profile ${p} activated`,
+  until: (t, d) => `until ${t} (${d})`, ongoing: "ongoing", alarmCount: n => `${n} ${n === 1 ? "alarm" : "alarms"}`,
+  sources: { android: "Android app", web: "web page", ntfy: "notification" }, unauthorized: "Token refused.",
+  today: "Today", yesterday: "Yesterday", week: d => `Week of ${d}`, weekEmpty: "No alarm or resugaring",
+  historyEmpty: "No event yet. Threshold crossings, alarms and resugarings will show up here.",
+  periods: ["24h", "7d", "14d", "30d", "90d"], statsNoData: "No reading over this period yet.",
+  timeInRanges: "Time in ranges", perDay: (h, m) => `${h} h ${String(m).padStart(2, "0")} / day`,
+  ranges: ["Very high", "High", "In range", "Low", "Very low"],
+  targets: ["target below 5 %", "target below 25 % with very high", "target above 70 %", "target below 4 % with very low", "target below 1 %"],
+  glucose: "Glucose", mean: "Mean glucose", gmi: "Estimated HbA1c (GMI)", cv: "Variability (CV)", cvTarget: "target 36 % or less",
+  sd: "Standard deviation", data: "Data", coverage: "Sensor data received", coverageTarget: "at least 70 % for reliable statistics",
+  readings: "Readings", since: "First reading of the period",
+  statsNote: "Standard ranges of the international consensus, as in Dexcom Clarity, independent of the alarm thresholds. Readings are kept 90 days on the server, from the installation of this version: Dexcom Share only provides the last 24 hours.",
+  exportCsv: "Export the readings (CSV)", exported: n => `${n} ${n === 1 ? "reading" : "readings"} exported.`, exportFailed: e => `Export failed: ${e}`,
+  notifTitle: "Notifications",
+  notifAlarms: "Alarms", notifOther: "Other", notifActions: "Resugaring or cancellation made elsewhere", notifNight: "Night summary",
+  notifUrgentWarning: "Off: no urgent low notification on this phone.", notifFailed: e => `Saving failed: ${e}`,
+};
+document.documentElement.lang = FR ? "fr" : "en";
+document.getElementById("openNotifications").setAttribute("aria-label", T.notifTitle);
+document.querySelectorAll("[data-t]").forEach(el => { el.textContent = T[el.dataset.t]; });
+
+const ARROWS = { DOUBLE_UP: "⇈", SINGLE_UP: "↑", FORTY_FIVE_UP: "↗", FLAT: "→", FORTY_FIVE_DOWN: "↘", SINGLE_DOWN: "↓", DOUBLE_DOWN: "⇊" };
+// Chart spans, point radii and minutes between two labelled clock times, as ChartRange in the app.
+const RANGES = [
+  { hours: 1, radius: 5, tick: 15 }, { hours: 3, radius: 4, tick: 60 }, { hours: 6, radius: 3, tick: 120 },
+  { hours: 12, radius: 2, tick: 180 }, { hours: 24, radius: 1.5, tick: 360 },
+];
+const PERIOD_DAYS = [1, 7, 14, 30, 90];
+const MIN_Y = 40, DEFAULT_MAX_Y = 320, GUTTER = 28;
+const TOKEN_KEY = "smartfollow-token";
+const DAY_MS = 24 * 3600000;
+const $ = id => document.getElementById(id);
+
+let token = null;
+let settings = { urgentLowMgDl: 55, lowMgDl: 70, targetHighMgDl: 180, highMgDl: 250, urgentHighMgDl: 300 };
+let readings = [];
+let resugarings = [];
+let rangeHours = Number(safeGet("smartfollow-range")) || 3;
+if (!RANGES.some(r => r.hours === rangeHours)) rangeHours = 3;
+let periodDays = 14;
+let tab = "monitor";
+let touchX = null;
+
+function safeGet(key) { try { return localStorage.getItem(key); } catch { return null; } }
+function safeSet(key, value) { try { value == null ? localStorage.removeItem(key) : localStorage.setItem(key, value); } catch { /* private mode */ } }
+
+// A link like https://server/#token=... signs in once; the token is then kept on the phone.
+const hashToken = new URLSearchParams(location.hash.slice(1)).get("token");
+if (hashToken) { safeSet(TOKEN_KEY, hashToken); history.replaceState(null, "", location.pathname); }
+token = safeGet(TOKEN_KEY);
+
+async function api(path, options = {}) {
+  const response = await fetch(path, { ...options, headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } });
+  if (response.status === 401) { safeSet(TOKEN_KEY, null); token = null; showLogin(T.unauthorized); throw new Error("unauthorized"); }
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+
+function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name); }
+
+function color(mgDl) {
+  // Symmetric for lows and highs: green in range, orange up to the urgent thresholds, red beyond.
+  if (mgDl < settings.urgentLowMgDl || mgDl > settings.highMgDl) return css("--out");
+  if (mgDl < settings.lowMgDl || mgDl > settings.targetHighMgDl) return css("--near");
+  return css("--range");
+}
+
+function time(ms) { return new Date(ms).toLocaleTimeString(LOCALE, { hour: "2-digit", minute: "2-digit" }); }
+function number(value, digits) { return value.toLocaleString(LOCALE, { minimumFractionDigits: digits, maximumFractionDigits: digits }); }
+function el(tag, className, text) {
+  const e = document.createElement(tag);
+  if (className) e.className = className;
+  if (text != null) e.textContent = text;
+  return e;
+}
+
+// ---- Monitoring page ----
+
+function renderStatus(status) {
+  const latest = status.latest;
+  $("stoppedBanner").hidden = status.running;
+  $("value").textContent = latest ? latest.mgDl : "—";
+  $("arrow").textContent = latest ? (ARROWS[latest.trend] || "") : "";
+  // A stale value is greyed out so that it is never mistaken for the current glucose.
+  const tint = latest && status.fresh ? color(latest.mgDl) : "var(--muted)";
+  $("value").style.color = tint;
+  $("arrow").style.color = tint;
+  $("age").textContent = latest ? T.ago(Math.max(0, Math.floor((status.serverTimeMillis - latest.timestampMillis) / 60000))) : "";
+  const rate = status.rateMgDlPerMin;
+  $("rate").textContent = rate != null ? T.rate((rate >= 0 ? "+" : "") + number(rate, 1)) : "";
+  $("alarm").hidden = !status.alarm;
+  $("alarmLabel").textContent = status.alarm ? T.alarms[status.alarm] : "";
+  const snoozing = status.snoozeEndsAtMillis != null;
+  $("snooze").hidden = !status.running || !snoozing;
+  // Only while a low (or a low soon) is going on, when a resugaring is the answer.
+  const RESUGARING_ALARMS = ["URGENT_LOW", "FAST_DROP", "NO_RECOVERY", "LOW", "LOW_SOON"];
+  $("resugar").hidden = !status.running || snoozing || !status.conditions.some(c => RESUGARING_ALARMS.includes(c));
+  if (snoozing) $("snoozeLabel").textContent = T.snooze(Math.max(0, Math.ceil((status.snoozeEndsAtMillis - status.serverTimeMillis) / 60000)));
+  $("error").hidden = !status.lastError;
+  $("error").textContent = status.lastError || "";
+  $("lastFetch").textContent = status.lastFetchMillis ? T.lastFetch(time(status.lastFetchMillis)) : "";
+  $("refresh").hidden = !status.running;
+  $("waiting").hidden = !(latest == null && status.running && !status.lastError);
+}
+
+function renderRanges() {
+  $("ranges").replaceChildren(...RANGES.map(r => {
+    const b = el("button", r.hours === rangeHours ? "active" : "", `${r.hours}h`);
+    b.onclick = () => { rangeHours = r.hours; safeSet("smartfollow-range", String(r.hours)); renderRanges(); renderChart(); };
+    return b;
+  }));
+}
+
+/**
+ * Glucose over the chosen span, as GlucoseChart in the app: target range shaded, thresholds
+ * dashed with their value in a left gutter, resugarings as vertical lines, and a cursor that
+ * follows the finger with the value and time of the closest reading.
+ */
+function renderChart() {
+  const canvas = $("chart");
+  const ratio = window.devicePixelRatio || 1;
+  const width = canvas.clientWidth, height = canvas.clientHeight;
+  canvas.width = width * ratio; canvas.height = height * ratio;
+  const ctx = canvas.getContext("2d");
+  ctx.scale(ratio, ratio);
+  const now = Date.now(), windowMs = rangeHours * 3600000;
+  const visible = readings.filter(r => r.timestampMillis >= now - windowMs);
+  const maxY = Math.max(DEFAULT_MAX_Y, ...visible.map(r => r.mgDl + 20));
+  const plotWidth = width - GUTTER;
+  const x = t => GUTTER + plotWidth * (1 - (now - t) / windowMs);
+  const y = v => height * (1 - (Math.min(Math.max(v, MIN_Y), maxY) - MIN_Y) / (maxY - MIN_Y));
+
+  ctx.fillStyle = css("--band");
+  ctx.fillRect(GUTTER, y(settings.targetHighMgDl), plotWidth, y(settings.lowMgDl) - y(settings.targetHighMgDl));
+  const ticks = clockTicks(now - windowMs, now, RANGES.find(r => r.hours === rangeHours).tick);
+  ctx.strokeStyle = css("--line"); ctx.lineWidth = 1;
+  ticks.forEach(t => { ctx.beginPath(); ctx.moveTo(x(t), 0); ctx.lineTo(x(t), height); ctx.stroke(); });
+
+  // From the top: each label is centred on its line, pushed down if it would overlap the previous one.
+  ctx.font = "bold 10px -apple-system, sans-serif";
+  ctx.textBaseline = "top";
+  const labelHeight = 12;
+  let previousBottom = -Infinity;
+  [settings.urgentLowMgDl, settings.lowMgDl, settings.targetHighMgDl, settings.highMgDl, settings.urgentHighMgDl]
+    .filter(v => v != null)
+    .sort((a, b) => b - a)
+    .forEach(v => {
+      // Low thresholds take the colour of the zone below, high ones of the zone above.
+      const c = color(v <= settings.lowMgDl ? v - 1 : v + 1);
+      const lineY = y(v);
+      ctx.setLineDash([8, 6]); ctx.strokeStyle = c; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(GUTTER, lineY); ctx.lineTo(width, lineY); ctx.stroke();
+      ctx.setLineDash([]);
+      const top = Math.min(Math.max(lineY - labelHeight / 2, previousBottom, 0), height - labelHeight);
+      ctx.fillStyle = c;
+      ctx.fillText(String(v), GUTTER - ctx.measureText(String(v)).width - 4, top);
+      previousBottom = top + labelHeight;
+    });
+
+  ctx.strokeStyle = css("--accent"); ctx.lineWidth = 2;
+  resugarings.filter(t => t >= now - windowMs).forEach(t => { ctx.beginPath(); ctx.moveTo(x(t), 0); ctx.lineTo(x(t), height); ctx.stroke(); });
+  const radius = RANGES.find(r => r.hours === rangeHours).radius;
+  visible.forEach(r => { ctx.fillStyle = color(r.mgDl); ctx.beginPath(); ctx.arc(x(r.timestampMillis), y(r.mgDl), radius, 0, 2 * Math.PI); ctx.fill(); });
+
+  // Cursor: the reading closest to the finger, with its value and time.
+  if (touchX != null && visible.length) {
+    const touched = visible.reduce((best, r) => Math.abs(x(r.timestampMillis) - touchX) < Math.abs(x(best.timestampMillis) - touchX) ? r : best);
+    const cx = x(touched.timestampMillis), cy = y(touched.mgDl);
+    ctx.globalAlpha = 0.6; ctx.strokeStyle = css("--text"); ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, height); ctx.stroke();
+    ctx.globalAlpha = 1; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(cx, cy, radius + 3, 0, 2 * Math.PI); ctx.stroke();
+    ctx.font = "bold 13px -apple-system, sans-serif";
+    const text = `${touched.mgDl} mg/dL · ${time(touched.timestampMillis)}`;
+    const padding = 6, boxWidth = ctx.measureText(text).width + 2 * padding, boxHeight = 16 + 2 * padding;
+    const left = Math.min(Math.max(cx - boxWidth / 2, GUTTER), width - boxWidth);
+    ctx.fillStyle = css("--line");
+    ctx.beginPath();
+    // roundRect needs iOS 16; older Safari gets square corners.
+    if (ctx.roundRect) ctx.roundRect(left, 0, boxWidth, boxHeight, padding); else ctx.rect(left, 0, boxWidth, boxHeight);
+    ctx.fill();
+    ctx.fillStyle = css("--text");
+    ctx.fillText(text, left + padding, padding + 1);
+  }
+
+  // The clock time of each grid line, centred under it but kept within the chart.
+  $("labels").replaceChildren(...ticks.map(t => el("span", "", time(t))));
+  [...$("labels").children].forEach((span, i) => {
+    span.style.left = `${Math.min(Math.max(x(ticks[i]) - span.offsetWidth / 2, GUTTER), width - span.offsetWidth)}px`;
+  });
+}
+
+/**
+ * Round clock times within (from, to], every `stepMinutes` from midnight in the local time
+ * zone (a multiple of 15): the grid lines and time labels of the chart, as clockTicks in the app.
+ */
+function clockTicks(from, to, stepMinutes) {
+  const ticks = [];
+  const t = new Date(from);
+  t.setMinutes(0, 0, 0);
+  for (; t.getTime() <= to; t.setMinutes(t.getMinutes() + 15)) {
+    if (t.getTime() > from && (t.getHours() * 60 + t.getMinutes()) % stepMinutes === 0) ticks.push(t.getTime());
+  }
+  return ticks;
+}
+
+// The gesture is captured, so that dragging on the chart does not scroll the page.
+const chart = $("chart");
+chart.addEventListener("pointerdown", e => {
+  chart.setPointerCapture(e.pointerId);
+  touchX = e.offsetX; renderChart();
+});
+chart.addEventListener("pointermove", e => { if (touchX != null) { touchX = e.offsetX; renderChart(); } });
+["pointerup", "pointercancel"].forEach(type => chart.addEventListener(type, () => { touchX = null; renderChart(); }));
+
+// ---- History page ----
+
+function eventLabel(e) {
+  const alarm = e.alarmType ? T.alarms[e.alarmType] : "";
+  switch (e.kind) {
+    case "CONDITION_STARTED": return e.alarmType === "STALE_DATA" ? T.dataLost : T.started(alarm);
+    case "CONDITION_ENDED": return e.alarmType === "STALE_DATA" ? T.dataBack : T.ended(alarm);
+    case "ALARM_RANG": return T.rang(alarm);
+    case "ACKNOWLEDGED": return alarm ? T.ackType(alarm) : T.ack;
+    case "RESUGARING": return T.resugared;
+    case "RESUGARING_CANCELLED": return T.cancelled;
+    case "SNOOZE_ENDED": return T.snoozeEnded;
+    case "MONITORING_STARTED": return T.monStarted;
+    case "MONITORING_STOPPED": return T.monStopped;
+    case "PROFILE_CHANGED": return T.profileChanged(e.profile || "");
+    default: return e.kind;
+  }
+}
+
+function eventColor(e) {
+  switch (e.kind) {
+    case "ALARM_RANG": case "CONDITION_STARTED": return css("--danger");
+    case "CONDITION_ENDED": return css("--range");
+    case "RESUGARING": case "RESUGARING_CANCELLED": case "SNOOZE_ENDED": return css("--accent");
+    default: return css("--muted");
+  }
+}
+
+/** Resugarings still standing (not cancelled right after), drawn on the chart. */
+function resugaringTimes(events) {
+  const kept = [];
+  [...events].sort((a, b) => a.timestampMillis - b.timestampMillis).forEach(e => {
+    if (e.kind === "RESUGARING") kept.push(e.timestampMillis);
+    if (e.kind === "RESUGARING_CANCELLED") kept.pop();
+  });
+  return kept;
+}
+
+function dayKey(ms) { const d = new Date(ms); return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; }
+
+const HIDDEN_KINDS = ["ACKNOWLEDGED", "MONITORING_STARTED", "MONITORING_STOPPED", "SNOOZE_ENDED"];
+const LOW_TYPES = ["URGENT_LOW", "FAST_DROP", "NO_RECOVERY", "LOW", "LOW_SOON"];
+
+/** Index of the first reading at or after `millis`, in readings sorted by time. */
+function lowerBound(sorted, millis) {
+  let low = 0, high = sorted.length;
+  while (low < high) { const middle = (low + high) >> 1; if (sorted[middle].timestampMillis < millis) low = middle + 1; else high = middle; }
+  return low;
+}
+
+/**
+ * The lines of the history page, newest first, as HistoryEntries in the app: each alarm
+ * condition becomes one episode instead of its start, end and repeated alarms; a low soon that
+ * never rang is left out, as are technical events ("OK" presses, monitoring started or stopped,
+ * end of the resugaring snooze). `sortedReadings` give the extreme glucose of each episode.
+ */
+function historyEntries(events, sortedReadings) {
+  const entries = [];
+  const open = new Map();
+  const close = (type, endMillis) => {
+    const episode = open.get(type);
+    if (!episode) return;
+    open.delete(type);
+    // A low soon that stayed silent tells nothing: the low that may follow has its own line.
+    if (type === "LOW_SOON" && episode.alarmCount === 0) return;
+    let extreme = null;
+    if (type !== "STALE_DATA") {
+      const from = lowerBound(sortedReadings, episode.startMillis);
+      const to = endMillis == null ? sortedReadings.length : lowerBound(sortedReadings, endMillis + 1);
+      const values = [...episode.values, ...sortedReadings.slice(from, Math.max(from, to)).map(r => r.mgDl)];
+      if (values.length) extreme = LOW_TYPES.includes(type) ? Math.min(...values) : Math.max(...values);
+    }
+    entries.push({ episode: true, type, timestampMillis: episode.startMillis, endMillis, alarmCount: episode.alarmCount, extremeMgDl: extreme });
+  };
+  const openEpisode = e => {
+    if (!open.has(e.alarmType)) open.set(e.alarmType, { startMillis: e.timestampMillis, alarmCount: 0, values: [] });
+    const episode = open.get(e.alarmType);
+    if (e.mgDl != null) episode.values.push(e.mgDl);
+    return episode;
+  };
+  [...events].sort((a, b) => a.timestampMillis - b.timestampMillis).forEach(e => {
+    // The conditions are not followed while monitoring is off: an episode ends with it.
+    if (e.kind === "MONITORING_STOPPED" || e.kind === "MONITORING_STARTED") [...open.keys()].forEach(type => close(type, e.timestampMillis));
+    else if (HIDDEN_KINDS.includes(e.kind)) return;
+    else if (e.alarmType && e.kind === "CONDITION_STARTED") openEpisode(e);
+    else if (e.alarmType && e.kind === "CONDITION_ENDED") close(e.alarmType, e.timestampMillis);
+    else if (e.alarmType && e.kind === "ALARM_RANG") openEpisode(e).alarmCount++;
+    else entries.push(e);
+  });
+  [...open.keys()].forEach(type => close(type, null));
+  return entries.sort((a, b) => b.timestampMillis - a.timestampMillis);
+}
+
+function duration(ms) {
+  const minutes = Math.floor(ms / 60000);
+  return minutes < 60 ? `${minutes} min` : `${Math.floor(minutes / 60)} h ${String(minutes % 60).padStart(2, "0")}`;
+}
+
+/** Days shown in detail, today included; older entries are grouped by week. */
+const DETAILED_DAYS = 7;
+/** The parents' order, as SUMMARY_ORDER in the app. */
+const SUMMARY_ORDER = ["LOW_SOON", "LOW", "URGENT_LOW", "HIGH", "URGENT_HIGH", "FAST_DROP", "STALE_DATA", "NO_RECOVERY"];
+
+/** Days and weeks whose folding differs from the default (today unfolded, the others folded). */
+const toggledDays = new Set();
+
+function startOfDay(ms) { const d = new Date(ms); d.setHours(0, 0, 0, 0); return d; }
+
+/** Monday of the week of `ms`, at midnight. */
+function weekStart(ms) { const d = startOfDay(ms); d.setDate(d.getDate() - (d.getDay() + 6) % 7); return d; }
+
+/**
+ * "Low ×2 (min 62) · High ×1 (max 290) · Resugaring ×1": the episodes of a week counted by
+ * type and its resugarings not cancelled, as HistoryEntries.summarize in the app.
+ */
+function summaryText(entries) {
+  const parts = SUMMARY_ORDER.flatMap(type => {
+    const episodes = entries.filter(e => e.episode && e.type === type);
+    if (!episodes.length) return [];
+    const extremes = episodes.map(e => e.extremeMgDl).filter(v => v != null);
+    const counted = `${type === "STALE_DATA" ? T.dataLost : T.alarms[type]} ×${episodes.length}`;
+    if (!extremes.length) return [counted];
+    return [LOW_TYPES.includes(type) ? `${counted} (min ${Math.min(...extremes)})` : `${counted} (max ${Math.max(...extremes)})`];
+  });
+  const resugarings = entries.filter(e => e.kind === "RESUGARING").length - entries.filter(e => e.kind === "RESUGARING_CANCELLED").length;
+  if (resugarings > 0) parts.push(`${T.resugared} ×${resugarings}`);
+  return parts.length ? parts.join(" · ") : T.weekEmpty;
+}
+
+function entryItem(e) {
+  const li = el("li");
+  const dot = el("span", "dot");
+  const label = el("span", "label");
+  let mgDl = e.mgDl;
+  if (e.episode) {
+    // "Low", then "until 21:40 (37 min) · 3 alarms", with the lowest glucose of the episode.
+    dot.style.background = e.alarmCount > 0 ? css("--danger") : css("--muted");
+    label.append(e.type === "STALE_DATA" ? T.dataLost : T.alarms[e.type]);
+    if (e.alarmCount > 0) label.style.fontWeight = "700";
+    const period = e.endMillis == null ? T.ongoing : T.until(time(e.endMillis), duration(e.endMillis - e.timestampMillis));
+    const detail = el("span", "detail", period + (e.alarmCount > 0 ? ` · ${T.alarmCount(e.alarmCount)}` : ""));
+    detail.style.fontWeight = "400";
+    label.append(detail);
+    mgDl = e.extremeMgDl;
+  } else {
+    dot.style.background = eventColor(e);
+    label.append(eventLabel(e) + (e.source ? ` (${T.sources[e.source] || e.source})` : ""));
+    if (e.kind === "RESUGARING") label.style.fontWeight = "700";
+  }
+  li.append(el("span", "time", time(e.timestampMillis)), dot, label);
+  if (mgDl != null) {
+    const g = el("span", "glucose", `${mgDl} mg/dL`); g.style.color = color(mgDl);
+    li.append(g);
+  }
+  return li;
+}
+
+function fullDate(ms) { return new Date(ms).toLocaleDateString(LOCALE, { weekday: "long", day: "numeric", month: "long", year: "numeric" }); }
+
+/** Splits entries, newest first, into groups of consecutive entries with the same key. */
+function groupBy(entries, keyOf) {
+  const groups = [];
+  entries.forEach(e => {
+    const key = keyOf(e.timestampMillis);
+    if (!groups.length || groups[groups.length - 1].key !== key) groups.push({ key, millis: e.timestampMillis, entries: [] });
+    groups[groups.length - 1].entries.push(e);
+  });
+  return groups;
+}
+
+/**
+ * Monitoring history, newest first, as HistoryScreen in the app: each alarm condition on one
+ * line from its start to its end. The last DETAILED_DAYS days are grouped by day; older entries
+ * by week (Monday to Sunday), summed up under the week's title. Each day and week folds under
+ * its title; only today is unfolded at first.
+ */
+function renderHistory(events) {
+  const shown = historyEntries(events, historyReadings());
+  $("historyEmpty").hidden = shown.length > 0;
+  const today = dayKey(Date.now()), yesterday = dayKey(Date.now() - DAY_MS);
+  const firstDetailed = startOfDay(Date.now());
+  firstDetailed.setDate(firstDetailed.getDate() - (DETAILED_DAYS - 1));
+  const recent = shown.filter(e => e.timestampMillis >= firstDetailed.getTime());
+  const older = shown.filter(e => e.timestampMillis < firstDetailed.getTime());
+
+  const section = (key, title, summary, entries, unfolded, content) => {
+    const header = el("div", "day");
+    header.append(el("span", unfolded ? "chevron open" : "chevron", "›"), el("span", "title", title), el("span", "count", String(entries.length)));
+    if (summary != null) header.append(el("span", "summary", summary));
+    header.onclick = () => {
+      toggledDays.has(key) ? toggledDays.delete(key) : toggledDays.add(key);
+      renderHistory(events);
+    };
+    const body = el("div");
+    if (unfolded) body.replaceChildren(...content());
+    body.hidden = !unfolded;
+    const s = el("section");
+    s.append(header, body);
+    return s;
+  };
+  const list = entries => { const ol = el("ol"); ol.replaceChildren(...entries.map(entryItem)); return ol; };
+
+  const days = groupBy(recent, dayKey).map(day => section(
+    day.key,
+    day.key === today ? T.today : day.key === yesterday ? T.yesterday : fullDate(day.millis),
+    null,
+    day.entries,
+    (day.key === today) !== toggledDays.has(day.key),
+    () => [list(day.entries)],
+  ));
+  const weeks = groupBy(older, ms => `week-${weekStart(ms).getTime()}`).map(week => section(
+    week.key,
+    T.week(weekStart(week.millis).toLocaleDateString(LOCALE, { day: "numeric", month: "long", year: "numeric" })),
+    summaryText(week.entries),
+    week.entries,
+    toggledDays.has(week.key),
+    () => groupBy(week.entries, dayKey).flatMap(day => [el("p", "weekday", fullDate(day.millis)), list(day.entries)]),
+  ));
+  $("days").replaceChildren(...days, ...weeks);
+}
+
+// ---- Statistics page ----
+
+// Colours of the consensus ranges, as in Dexcom Clarity, from very high to very low.
+const RANGE_COLORS = ["#fb8c00", "#fdd835", "#43a047", "#e53935", "#b71c1c"];
+
+function renderPeriods() {
+  $("periods").replaceChildren(...PERIOD_DAYS.map((days, i) => {
+    const b = el("button", days === periodDays ? "active" : "", T.periods[i]);
+    b.onclick = () => { periodDays = days; renderPeriods(); loadStatistics(); };
+    return b;
+  }));
+}
+
+function metric(label, value, hint) {
+  const row = el("div", "metric");
+  const text = el("div");
+  text.append(el("div", "", label));
+  if (hint) text.append(el("div", "small muted", hint));
+  row.append(text, el("div", "figure", value));
+  return row;
+}
+
+function percent(share) { return `${Math.round(share * 100)} %`; }
+
+function renderStatistics(stats) {
+  $("statsEmpty").hidden = stats != null;
+  if (stats == null) { $("statsCards").replaceChildren(); return; }
+  const shares = [stats.veryHigh, stats.high, stats.inRange, stats.low, stats.veryLow];
+  const bounds = ["> 250", "181–250", "70–180", "54–69", "< 54"];
+
+  const ranges = el("section", "card");
+  ranges.append(el("h3", "", T.timeInRanges));
+  // Stacked bar, from very low on the left to very high on the right, as in the usual reports.
+  const stack = el("div", "stack");
+  shares.map((share, i) => ({ share, i })).reverse().forEach(({ share, i }) => {
+    const part = el("div"); part.style.flex = String(share); part.style.background = RANGE_COLORS[i];
+    stack.append(part);
+  });
+  ranges.append(stack);
+  shares.forEach((share, i) => {
+    const minutesPerDay = Math.floor(share * 24 * 60);
+    const row = metric(`${T.ranges[i]} (${bounds[i]})`, percent(share), T.targets[i]);
+    const dot = el("span", "dot"); dot.style.background = RANGE_COLORS[i];
+    row.prepend(dot);
+    row.lastChild.append(el("div", "small muted", T.perDay(Math.floor(minutesPerDay / 60), minutesPerDay % 60)));
+    row.lastChild.lastChild.style.fontWeight = "400";
+    ranges.append(row);
+  });
+
+  const glucose = el("section", "card");
+  glucose.append(
+    el("h3", "", T.glucose),
+    metric(T.mean, `${Math.trunc(stats.meanMgDl)} mg/dL`),
+    metric(T.gmi, `${number(stats.gmiPercent, 1)} %`),
+    metric(T.cv, `${number(stats.coefficientOfVariationPercent, 0)} %`, T.cvTarget),
+    metric(T.sd, `${Math.trunc(stats.standardDeviationMgDl)} mg/dL`),
+  );
+
+  const data = el("section", "card");
+  data.append(
+    el("h3", "", T.data),
+    metric(T.coverage, percent(stats.coverage), T.coverageTarget),
+    metric(T.readings, String(stats.readingCount)),
+    metric(T.since, new Date(stats.firstReadingMillis).toLocaleDateString(LOCALE, { day: "numeric", month: "short", year: "numeric" })),
+  );
+  $("statsCards").replaceChildren(ranges, glucose, data);
+}
+
+async function loadStatistics() {
+  try { renderStatistics((await api(`/api/statistics?days=${periodDays}`)).statistics); } catch { /* shown at the next refresh */ }
+}
+
+/** Saves every reading kept by the server as CSV, with the same columns as the app's export. */
+async function exportCsv() {
+  try {
+    const kept = await api("/api/readings?days=90");
+    const pad = n => String(n).padStart(2, "0");
+    const local = ms => { const d = new Date(ms); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+    const lines = ["timestamp_utc,local_time,mg_dl,trend", ...kept.map(r => `${new Date(r.timestampMillis).toISOString()},${local(r.timestampMillis)},${r.mgDl},${r.trend}`)];
+    const link = el("a");
+    link.href = URL.createObjectURL(new Blob([lines.join("\n") + "\n"], { type: "text/csv" }));
+    link.download = `smartfollow-readings-${local(Date.now()).slice(0, 10)}.csv`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(link.href), 10000);
+    $("exportResult").textContent = T.exported(kept.length);
+  } catch (e) {
+    $("exportResult").textContent = T.exportFailed(e.message);
+  }
+}
+
+// ---- ntfy notifications page ----
+
+// In the order chosen by the parents, not the alarm priority.
+const ALARM_TYPES = ["LOW_SOON", "LOW", "URGENT_LOW", "HIGH", "URGENT_HIGH", "FAST_DROP", "STALE_DATA", "NO_RECOVERY"];
+/** Notifications sent to ntfy, as chosen on this page; `null` until loaded. */
+let ntfyFilter = null;
+
+function toggle(label, on, onChange, warning) {
+  const row = el("label", "toggle");
+  const text = el("span", "", label);
+  if (warning && !on) text.append(el("span", "detail warn", warning));
+  const box = el("input");
+  box.type = "checkbox";
+  box.checked = on;
+  box.onchange = () => onChange(box.checked);
+  row.append(text, box);
+  return row;
+}
+
+function renderNotifications() {
+  if (ntfyFilter == null) return;
+  const muted = ntfyFilter.mutedAlarms;
+  $("notifAlarms").replaceChildren(...ALARM_TYPES.map(type => toggle(
+    T.alarms[type],
+    !muted.includes(type),
+    on => saveNtfyFilter({ ...ntfyFilter, mutedAlarms: on ? muted.filter(t => t !== type) : [...muted, type] }),
+    type === "URGENT_LOW" ? T.notifUrgentWarning : null,
+  )));
+  $("notifOther").replaceChildren(
+    toggle(T.notifActions, ntfyFilter.actions, on => saveNtfyFilter({ ...ntfyFilter, actions: on })),
+    toggle(T.notifNight, ntfyFilter.nightSummary, on => saveNtfyFilter({ ...ntfyFilter, nightSummary: on })),
+  );
+}
+
+async function loadNotifications() {
+  try { ntfyFilter = await api("/api/ntfy-filter"); renderNotifications(); } catch { /* shown at the next refresh */ }
+}
+
+async function saveNtfyFilter(filter) {
+  try {
+    ntfyFilter = await api("/api/ntfy-filter", { method: "PUT", body: JSON.stringify(filter) });
+    $("notifResult").textContent = "";
+  } catch (e) {
+    $("notifResult").textContent = T.notifFailed(e.message);
+  }
+  renderNotifications();
+}
+
+// ---- Navigation and refresh ----
+
+function showTab(name) {
+  tab = name;
+  document.querySelectorAll("[data-tab]").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
+  ["monitor", "history", "statistics", "notifications"].forEach(page => { $(page).hidden = page !== name; });
+  if (name === "monitor") renderChart();
+  refresh();
+}
+
+/** The whole history, loaded when its page opens, then completed by each refresh. Newest first. */
+let fullHistory = null;
+/** Readings kept by the server (90 days), loaded with the history for the extreme of each episode. */
+let keptReadings = [];
+
+/** Kept readings followed by the newer ones of the last refresh, sorted by time. */
+function historyReadings() {
+  const last = keptReadings.length ? keptReadings[keptReadings.length - 1].timestampMillis : -Infinity;
+  return [...keptReadings, ...readings.filter(r => r.timestampMillis > last)];
+}
+
+async function refresh() {
+  if (!token) return;
+  try {
+    const loadHistory = tab === "history" && fullHistory == null;
+    // The settings follow the profile chosen in the app.
+    const [status, newReadings, events, newSettings, kept] = await Promise.all([
+      api("/api/status"), api("/api/readings"), api(`/api/events?limit=${loadHistory ? 50000 : 200}`), api("/api/settings"),
+      loadHistory ? api("/api/readings?days=90") : null,
+    ]);
+    settings = newSettings;
+    $("profile").textContent = settings.profileName || "";
+    readings = newReadings;
+    resugarings = resugaringTimes(events);
+    if (loadHistory) {
+      fullHistory = events;
+      keptReadings = [...kept].sort((a, b) => a.timestampMillis - b.timestampMillis);
+    } else if (fullHistory != null) {
+      const newest = fullHistory.length ? fullHistory[0].timestampMillis : -Infinity;
+      fullHistory = [...events.filter(e => e.timestampMillis > newest), ...fullHistory];
+    }
+    renderStatus(status);
+    if (tab === "monitor") renderChart();
+    if (tab === "history") renderHistory(fullHistory);
+    if (tab === "statistics") loadStatistics();
+    if (tab === "notifications") loadNotifications();
+  } catch (e) {
+    if (e.message !== "unauthorized") { $("error").hidden = false; $("error").textContent = e.message; }
+  }
+}
+
+async function act(action) {
+  try {
+    await api("/api/actions", { method: "POST", body: JSON.stringify({ action, source: "web" }) });
+  } finally {
+    refresh();
+  }
+}
+
+function showLogin(message) {
+  $("app").hidden = true;
+  $("login").hidden = false;
+  if (message) $("tokenInput").placeholder = message;
+}
+
+async function start() {
+  $("login").hidden = true;
+  $("app").hidden = false;
+  try { settings = await api("/api/settings"); } catch { /* defaults */ }
+  renderRanges();
+  renderPeriods();
+  showTab(tab);
+}
+
+$("loginForm").onsubmit = e => {
+  e.preventDefault();
+  token = $("tokenInput").value.trim();
+  safeSet(TOKEN_KEY, token);
+  start();
+};
+$("signOut").onclick = () => {
+  if (!confirm(T.signOutConfirm)) return;
+  safeSet(TOKEN_KEY, null);
+  token = null;
+  fullHistory = null;
+  keptReadings = [];
+  showLogin();
+};
+$("refresh").onclick = async () => {
+  // Downloads from Dexcom Share now, then shows the result once it had time to arrive.
+  try { await api("/api/refresh", { method: "POST" }); } catch { /* the next refresh shows the error */ }
+  setTimeout(refresh, 3000);
+};
+$("export").onclick = exportCsv;
+document.querySelectorAll("[data-tab]").forEach(b => { b.onclick = () => showTab(b.dataset.tab); });
+document.querySelectorAll("[data-action]").forEach(b => { b.onclick = () => act(b.dataset.action); });
+document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
+window.addEventListener("resize", renderChart);
+setInterval(refresh, 30000);
+token ? start() : showLogin();
+</script>
+</body>
+</html>

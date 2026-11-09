@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">SmartFollow</string>
+    <string name="glucose_value" translatable="false">%1$d mg/dL %2$s</string>
+    <string name="rate" translatable="false">%1$s mg/dL/min</string>
+
+    <string name="channel_monitoring">Glucose monitoring</string>
+    <string name="channel_alarms">Glucose alarms</string>
+
+    <string name="monitoring_stopped">Monitoring stopped</string>
+    <string name="snooze_until">Resugaring snooze until %1$s</string>
+    <string name="snooze_remaining">Resugaring snooze: %1$d min left</string>
+    <string name="in_range">No alert</string>
+    <string name="no_recent_data">No recent data</string>
+    <string name="waiting_for_data">Waiting for the first reading…</string>
+    <string name="reading_age">%1$d min ago</string>
+    <string name="last_fetch">Last update: %1$s</string>
+
+    <string name="acknowledge">OK</string>
+    <string name="resugaring_done">Resugaring done</string>
+    <string name="cancel">Cancel</string>
+    <string name="fix">Open settings</string>
+    <string name="refresh">Refresh</string>
+    <string name="start">Start</string>
+    <string name="stop_monitoring">Stop monitoring</string>
+    <string name="monitoring_stopped_banner">Monitoring stopped: no alarm will ring</string>
+    <string name="stop_confirm_title">Stop monitoring?</string>
+    <string name="stop_confirm_text">No alarm will ring anymore, urgent low included, until monitoring is started again, even after a phone restart.</string>
+    <string name="stop_confirm_yes">Stop monitoring</string>
+    <string name="sign_out">Sign out</string>
+    <string name="back">Back</string>
+
+    <string name="settings_title">Settings</string>
+    <string name="settings_snooze_title">Resugaring snooze</string>
+    <string name="settings_snooze_description">How long the low and low soon alarms stay silent after \"Resugaring done\". Urgent low, fast drop and no-recovery alarms still ring. A change also applies to a running snooze.</string>
+    <string name="settings_sound_theme_title">Sound theme</string>
+    <string name="settings_sound_theme_description">Built-in sounds of the alarms. A phone sound chosen for an alarm keeps priority.</string>
+    <string name="sound_theme_private">Personal</string>
+    <string name="sound_theme_default">Chimes</string>
+    <string name="settings_stale_delay">Alarm after</string>
+    <string name="sound_unavailable">ringtone not found</string>
+    <string name="settings_test">Test</string>
+    <string name="settings_stop_test">Stop</string>
+    <string name="settings_vibrate">Vibrate</string>
+    <string name="minutes_value" translatable="false">%1$d min</string>
+    <string name="percent_value" translatable="false">%1$d %%</string>
+    <string name="unit_mg_dl" translatable="false">mg/dL</string>
+    <string name="hours_value" translatable="false">%1$dh</string>
+
+    <string name="alarm_description_urgent_low">Rings even during the resugaring snooze.</string>
+    <string name="alarm_description_fast_drop">During the snooze, glucose dropping faster than 2 mg/dL per minute.</string>
+    <string name="alarm_description_no_recovery">During the snooze, glucose still not higher than at resugaring after 15 minutes.</string>
+    <string name="alarm_description_low">Silent during the resugaring snooze, rings again when it ends.</string>
+    <string name="alarm_description_stale_data">No new reading: check the wearer\'s phone (on, charged, Bluetooth and network on). During a resugaring snooze, it waits for the end of the snooze.</string>
+    <string name="alarm_description_high">Glucose above the threshold.</string>
+
+    <string name="alarm_urgent_low">Urgent low</string>
+    <string name="alarm_fast_drop">Dropping fast</string>
+    <string name="alarm_no_recovery">Not rising after resugaring</string>
+    <string name="alarm_low">Low</string>
+    <string name="alarm_stale_data">No data</string>
+    <string name="alarm_high">High</string>
+
+    <string name="error_invalid_credentials">Invalid username or password.</string>
+    <string name="error_account_locked">Account temporarily locked after too many attempts. Try again later.</string>
+    <string name="error_server">Dexcom Share error: %1$s</string>
+    <string name="error_network">Network error: %1$s</string>
+
+    <string name="issue_notifications_title">Notifications are off</string>
+    <string name="issue_notifications_description">Alarms cannot be shown without notifications.</string>
+    <string name="issue_battery_title">Battery optimization is on</string>
+    <string name="issue_battery_description">Android may delay data updates and alarms while the phone sleeps.</string>
+    <string name="issue_dnd_title">Do Not Disturb access is missing</string>
+    <string name="issue_dnd_description">Needed for alarms to go through Do Not Disturb.</string>
+    <string name="issue_full_screen_title">Full-screen alarms are not allowed</string>
+    <string name="issue_full_screen_description">Needed to show the alarm over the lock screen.</string>
+
+    <string name="setup_title">Connect to Dexcom Share</string>
+    <string name="setup_explanation">Enter the Dexcom account of the person wearing the sensor, not a Dexcom Follow account. Sharing must be enabled in their Dexcom G7 app, with at least one follower.</string>
+    <string name="setup_username">Dexcom username or email</string>
+    <string name="setup_password">Password</string>
+    <string name="setup_region">Account region</string>
+    <string name="region_outside_us">Outside the United States (Europe…)</string>
+    <string name="region_us">United States</string>
+    <string name="region_japan">Japan</string>
+    <string name="setup_connect">Test and connect</string>
+    <string name="glucose_mg_dl" translatable="false">%1$d mg/dL</string>
+    <string name="tab_monitor">Monitoring</string>
+    <string name="tab_history">History</string>
+    <string name="history_empty">No event yet. Threshold crossings, alarms and resugarings will show up here.</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="event_condition_started">%1$s: start</string>
+    <string name="event_condition_ended">%1$s: end</string>
+    <string name="event_data_lost">Data lost</string>
+    <string name="event_data_back">Data back</string>
+    <string name="event_alarm_rang">Alarm: %1$s</string>
+    <string name="event_acknowledged">OK pressed</string>
+    <string name="event_acknowledged_type">OK pressed: %1$s</string>
+    <string name="event_resugaring">Resugaring</string>
+    <string name="event_resugaring_cancelled">Resugaring cancelled</string>
+    <string name="event_snooze_ended">Resugaring snooze ended</string>
+    <string name="event_monitoring_started">Monitoring started</string>
+    <string name="event_monitoring_stopped">Monitoring stopped</string>
+    <string name="event_profile_changed">Profile %1$s activated</string>
+    <string name="close">Close</string>
+    <string name="profile_home">Home</string>
+    <string name="profile_school">School</string>
+    <string name="profiles_title">Profiles</string>
+    <string name="profiles_choose">Choose a profile</string>
+    <string name="profiles_manage">Manage profiles…</string>
+    <string name="profiles_new">New profile</string>
+    <string name="profiles_rename">Rename</string>
+    <string name="profiles_delete">Delete</string>
+    <string name="profiles_delete_title">Delete %1$s?</string>
+    <string name="profiles_delete_text">Its settings are lost.</string>
+    <string name="profiles_delete_active_text">Its settings are lost, and another profile becomes active.</string>
+    <string name="profiles_name">Name</string>
+    <string name="profiles_name_taken">Another profile already has this name.</string>
+    <string name="profiles_explanation">Each profile keeps its own settings; the checked one drives the alarms. A new profile starts as a copy of the active one.</string>
+    <string name="profiles_active_name">%1$s (active)</string>
+    <string name="settings_sync_title">Sharing server (optional)</string>
+    <string name="settings_sync_description">Shares resugarings, OK presses and these settings with the other parent through your SmartFollow server. Leave it empty to use the app on its own: alarms never depend on the server.</string>
+    <string name="settings_sync_url">Server address</string>
+    <string name="settings_sync_token">Access token</string>
+    <string name="settings_sync_https">The address must start with https://</string>
+    <string name="settings_sync_save">Test and save</string>
+    <string name="settings_sync_remove">Stop sharing</string>
+    <string name="settings_sync_saved">Connected to the server.</string>
+    <string name="settings_sync_failed">Cannot reach the server: %1$s</string>
+    <string name="sharing_ok">Sharing with the server works (last exchange at %1$s).</string>
+    <string name="sharing_failing">Sharing unavailable since %1$s: %2$s</string>
+    <string name="source_android">Android app</string>
+    <string name="source_web">web page</string>
+    <string name="source_ntfy">notification</string>
+    <string name="alarm_urgent_high">Urgent high</string>
+    <string name="alarm_description_urgent_high">Glucose above the urgent high threshold.</string>
+    <string name="settings_continuous_on">Rings without stopping until OK is pressed.</string>
+    <string name="settings_continuous_off">Rings for a few seconds, then again after the repeat interval if still active.</string>
+    <string name="about_title">About</string>
+    <string name="sign_out_confirm_title">Sign out?</string>
+    <string name="sign_out_confirm_text">Monitoring stops and the Dexcom account is removed from this phone. No alarm will ring until you sign in again.</string>
+    <string name="app_version" translatable="false">SmartFollow V%1$s</string>
+    <string name="tab_statistics">Statistics</string>
+    <string name="stats_title">Statistics</string>
+    <string name="period_day">24h</string>
+    <string name="period_week">7d</string>
+    <string name="period_two_weeks">14d</string>
+    <string name="period_month">30d</string>
+    <string name="period_quarter">90d</string>
+    <string name="stats_no_data">No reading over this period yet.</string>
+    <string name="stats_time_in_ranges">Time in ranges</string>
+    <string name="range_very_high">Very high</string>
+    <string name="range_high">High</string>
+    <string name="range_in">In range</string>
+    <string name="range_low">Low</string>
+    <string name="range_very_low">Very low</string>
+    <string name="target_very_high" formatted="false">target below 5 %</string>
+    <string name="target_high" formatted="false">target below 25 % with very high</string>
+    <string name="target_in_range" formatted="false">target above 70 %</string>
+    <string name="target_low" formatted="false">target below 4 % with very low</string>
+    <string name="target_very_low" formatted="false">target below 1 %</string>
+    <string name="stats_per_day">%1$d h %2$02d / day</string>
+    <string name="stats_glucose">Glucose</string>
+    <string name="stats_mean">Mean glucose</string>
+    <string name="stats_gmi">Estimated HbA1c (GMI)</string>
+    <string name="stats_cv">Variability (CV)</string>
+    <string name="target_cv" formatted="false">target 36 % or less</string>
+    <string name="stats_sd">Standard deviation</string>
+    <string name="stats_data">Data</string>
+    <string name="stats_coverage">Sensor data received</string>
+    <string name="target_coverage" formatted="false">at least 70 % for reliable statistics</string>
+    <string name="stats_readings">Readings</string>
+    <string name="stats_since">First reading of the period</string>
+    <plurals name="stats_note">
+        <item quantity="one">Standard ranges of the international consensus, as in Dexcom Clarity, independent of the alarm thresholds. Readings are kept %1$d year on this phone, from the installation of this version: Dexcom Share only provides the last 24 hours.</item>
+        <item quantity="other">Standard ranges of the international consensus, as in Dexcom Clarity, independent of the alarm thresholds. Readings are kept %1$d years on this phone, from the installation of this version: Dexcom Share only provides the last 24 hours.</item>
+    </plurals>
+    <string name="settings_thresholds_title">Glucose ranges</string>
+    <string name="settings_target_high">Top of the target</string>
+    <string name="hours_minutes" translatable="false">%1$d h %2$02d</string>
+    <string name="channel_info">Sharing and summaries</string>
+    <string name="alarm_low_soon">Low soon</string>
+    <string name="alarm_description_low_soon">Glucose still above the low threshold, but its trend reaches it within the prediction horizon. Silent during the resugaring snooze.</string>
+    <string name="settings_low_soon_horizon">Prediction</string>
+    <string name="settings_night_title">Night</string>
+    <string name="settings_night_volume_result">At night, alarms ring at %1$d %%.</string>
+    <string name="settings_night_start">Night starts at</string>
+    <string name="settings_night_end">Night ends at</string>
+    <string name="hour_value">%1$02d:00</string>
+    <string name="shared_action_text">At %1$s (%2$s)</string>
+    <string name="night_summary_title">Night summary (%1$s–%2$s)</string>
+    <string name="night_summary_no_data">No reading received during the night.</string>
+    <string name="night_summary_ranges">In target: %1$d %% · below %2$d: %3$s · above %4$d: %5$s</string>
+    <string name="night_summary_glucose">Min %1$d · mean %2$d · max %3$d mg/dL</string>
+    <plurals name="night_summary_alarms">
+        <item quantity="one">%d alarm</item>
+        <item quantity="other">%d alarms</item>
+    </plurals>
+    <plurals name="night_summary_resugarings">
+        <item quantity="one">%d resugaring</item>
+        <item quantity="other">%d resugarings</item>
+    </plurals>
+    <string name="export_csv">Export the readings (CSV)</string>
+    <plurals name="export_done">
+        <item quantity="one">%d reading exported.</item>
+        <item quantity="other">%d readings exported.</item>
+    </plurals>
+    <string name="export_failed">Export failed: %1$s</string>
+    <string name="history_until">until %1$s (%2$s)</string>
+    <string name="history_ongoing">ongoing</string>
+    <string name="settings_continuous_off_once">Rings for a few seconds, once per episode: again only if the prediction ends and comes back.</string>
+    <string name="settings_muted_on">Neither sound nor vibration on this phone: only the notification and the history. The other parent\'s notifications do not change.</string>
+    <string name="profile_discreet">Discreet</string>
+    <string name="history_week">Week of %1$s</string>
+    <string name="history_week_empty">No alarm or resugaring</string>
+    <string name="history_week_count" translatable="false">%1$s ×%2$d</string>
+    <string name="history_week_min" translatable="false">%1$s (min %2$d)</string>
+    <string name="history_week_max" translatable="false">%1$s (max %2$d)</string>
+    <string name="undo">Undo</string>
+    <string name="settings_profile_edited">Profile edited</string>
+    <string name="settings_profile_name">Profile %1$s</string>
+    <string name="settings_inactive_banner">%1$s is not the active profile (%2$s). These settings will apply once it is activated.</string>
+    <string name="settings_activate_profile">Activate %1$s</string>
+    <string name="settings_section_alarms">Alarms</string>
+    <string name="settings_group_lows">Lows</string>
+    <string name="settings_group_resugaring">After a resugaring</string>
+    <string name="settings_group_highs">Highs</string>
+    <string name="settings_group_data">Data</string>
+    <string name="alarm_state_on">Rings</string>
+    <string name="alarm_state_muted">Muted</string>
+    <string name="alarm_state_off">Off</string>
+    <string name="alarm_sub_low_soon">%1$d-minute prediction</string>
+    <string name="alarm_sub_below">Below %1$d mg/dL</string>
+    <string name="alarm_sub_above">Above %1$d mg/dL</string>
+    <string name="alarm_sub_fast_drop">Over 2 mg/dL per minute</string>
+    <string name="alarm_sub_no_recovery">After 15 min</string>
+    <string name="alarm_sub_stale">After %1$d min without a reading</string>
+    <string name="alarm_sub_until_ok">%1$s · until OK</string>
+    <string name="settings_section_glucose">Glucose</string>
+    <string name="settings_ranges_summary">Target %1$d–%2$d · high %3$d · urgent high %4$d</string>
+    <string name="settings_section_sound">Sound</string>
+    <string name="settings_alarm_volume">Alarm volume</string>
+    <string name="settings_section_night_resugaring">Night and resugaring</string>
+    <string name="settings_night_line">%1$s → %2$s · volume −%3$d %% · %4$s</string>
+    <string name="settings_night_summary_on">summary on</string>
+    <string name="settings_night_summary_off">no summary</string>
+    <string name="settings_snooze_sub">Low and low soon stay silent</string>
+    <string name="settings_section_app">For the whole app</string>
+    <string name="settings_section_app_sub">Does not depend on the profile.</string>
+    <string name="settings_server">Sharing server</string>
+    <string name="settings_server_off">Not set: the app works on its own</string>
+    <string name="settings_server_ok">Connected · last exchange %1$s</string>
+    <string name="settings_server_failing">Unavailable since %1$s</string>
+    <string name="settings_account">Dexcom account</string>
+    <string name="settings_restore">Restore the settings of %1$s…</string>
+    <string name="settings_restore_title">Restore the settings of %1$s?</string>
+    <string name="settings_restore_text">Thresholds, alarms, sounds and night go back to their default values.</string>
+    <string name="settings_restore_confirm">Restore</string>
+    <string name="settings_restore_done">Settings of %1$s restored</string>
+    <string name="alarm_off_locked">Always detected: it cannot be turned off.</string>
+    <string name="alarm_off_text">Off: neither detected nor logged in the history.</string>
+    <string name="settings_muted_safety_title">Safety alarm muted</string>
+    <string name="settings_muted_title">Muted alarm</string>
+    <string name="settings_section_trigger">Trigger</string>
+    <string name="settings_threshold">Threshold</string>
+    <string name="settings_threshold_sub">%1$s · set in Glucose ranges</string>
+    <string name="settings_section_behaviour">Behaviour</string>
+    <string name="settings_once">Once</string>
+    <string name="settings_until_ok">Until OK</string>
+    <string name="settings_repeat_every">Ring again after OK every</string>
+    <string name="settings_sound_muted_note">No effect while the alarm is muted.</string>
+    <string name="settings_sound">Sound</string>
+    <string name="settings_sound_default_suffix">%1$s (default)</string>
+    <string name="settings_sound_phone">Phone sound · %1$s</string>
+    <string name="settings_test_alarm">Test this alarm</string>
+    <string name="settings_test_note">Plays it for 5 seconds at the volume it would ring at now.</string>
+    <string name="settings_test_muted_note">Shows the notification as it will arrive, without sound since it is muted.</string>
+    <string name="test_notification_title">Test: %1$s</string>
+    <string name="test_notification_text">This is how the alarm will show, without sound.</string>
+    <string name="sound_sheet_title">Sound of the %1$s alarm</string>
+    <string name="sound_sheet_hint">Touch ▶ to hear a sound at the alarm volume.</string>
+    <string name="sound_sheet_theme">%1$s theme</string>
+    <string name="sound_sheet_default">default</string>
+    <string name="sound_sheet_phone">A phone sound…</string>
+    <string name="sound_sheet_listen">Listen</string>
+    <string name="thresholds_subtitle">Profile %1$s · mg/dL</string>
+    <string name="thresholds_hint">Drag a marker, or touch a value to type it. Used by the alarms, the chart and the colours.</string>
+    <string name="thresholds_in_range">In range</string>
+    <string name="thresholds_above">Above</string>
+    <string name="thresholds_up_to">Up to</string>
+    <string name="thresholds_below">Below</string>
+    <string name="thresholds_footnote">The scale is stretched at the bottom so that the low thresholds stay easy to set. The statistics keep the standard ranges of the international consensus.</string>
+    <string name="thresholds_value_title">%1$s (mg/dL)</string>
+    <string name="thresholds_value_range">Between %1$d and %2$d</string>
+    <string name="night_start">Start</string>
+    <string name="night_end">End</string>
+    <string name="night_duration">%1$d h of night, from %2$s to %3$s the next day.</string>
+    <string name="night_duration_same_day">%1$d h of night, from %2$s to %3$s.</string>
+    <string name="night_volume_section">Volume at night</string>
+    <string name="night_volume_label">Lower the alarms by</string>
+    <string name="night_volume_test">Test the night volume</string>
+    <string name="night_summary_section">Night summary</string>
+    <string name="night_summary_switch">Send the summary at %1$s</string>
+    <string name="night_summary_description">Time in the target, lowest and highest glucose, alarms and resugarings. Also sent to ntfy by the server.</string>
+    <string name="muted_banner_audible">Still ringing: %1$s.</string>
+    <string name="muted_banner_none">No alarm rings on this phone.</string>
+    <string name="muted_banner_back">Back to %1$s</string>
+    <string name="tile_unavailable">Profile deleted</string>
+    <plurals name="muted_banner_title">
+        <item quantity="one">%d alarm muted on this phone</item>
+        <item quantity="other">%d alarms muted on this phone</item>
+    </plurals>
+    <plurals name="tile_muted">
+        <item quantity="one">%d alarm muted</item>
+        <item quantity="other">%d alarms muted</item>
+    </plurals>
+</resources>

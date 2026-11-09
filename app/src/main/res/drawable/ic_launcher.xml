@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Launcher icon: white drop on a green circle. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <path
+        android:fillColor="#FF5DBB2E"
+        android:pathData="M24,0a24,24 0,1 0,0.01 0z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M24,9C24,9 14,20 14,27a10,10 0,0 0,20 0C34,20 24,9 24,9z" />
+</vector>

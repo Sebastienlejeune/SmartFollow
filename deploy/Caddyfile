@@ -1,0 +1,6 @@
+# Replace follow.example.com with the server's domain name. Caddy gets and renews the
+# HTTPS certificate by itself; ports 80 and 443 must be open.
+follow.example.com {
+	encode gzip
+	reverse_proxy 127.0.0.1:8080
+}

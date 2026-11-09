@@ -1,0 +1,25 @@
+.gradle/
+build/
+.kotlin/
+local.properties
+.idea/
+*.iml
+.DS_Store
+
+# Secrets: SSH keys and the real server configuration must never be committed.
+*.pem
+*.key
+*.ppk
+id_rsa*
+id_ed25519*
+deploy/smartfollow.env
+deploy/deploy.local.psd1
+*.env
+!*.env.example
+
+# Private sound themes, which cannot be published (see README).
+app/src/private/
+
+# Personal Claude Code settings (permissions) and context.
+.claude/settings.local.json
+CLAUDE.local.md

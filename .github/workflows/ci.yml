@@ -1,0 +1,45 @@
+# Tests, lint and builds of every module, on each pull request and push to main.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      # Also checks that the Gradle wrapper is a genuine one.
+      - uses: gradle/actions/setup-gradle@v4
+
+      # The runner provides the Android SDK (ANDROID_HOME); the private sound theme is not in the
+      # repository, so the app builds with the Chimes theme only.
+      - name: Test, lint and build
+        run: >
+          ./gradlew --no-daemon
+          allTests :monitor:test :sync:test :server:test :app:testDebugUnitTest
+          :app:lintDebug :app:assembleDebug :server:distZip
+
+      - name: Keep the reports of a failed run
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: "**/build/reports/"
+          retention-days: 7

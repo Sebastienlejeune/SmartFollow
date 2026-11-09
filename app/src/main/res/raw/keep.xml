@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Alarm sounds are looked up by name (AlarmSounds.resourceId), since private themes may be
+     missing from the build: keep them all from resource shrinking. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@raw/alarm_*" />

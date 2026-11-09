@@ -1,0 +1,24 @@
+[Unit]
+Description=SmartFollow server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=smartfollow
+Group=smartfollow
+EnvironmentFile=/etc/smartfollow/smartfollow.env
+Environment=JAVA_OPTS=-Xmx256m
+WorkingDirectory=/var/lib/smartfollow
+ExecStart=/opt/smartfollow/smartfollow-server/bin/smartfollow-server
+Restart=always
+RestartSec=10
+
+# Hardening: the service only writes its data directory.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/smartfollow
+
+[Install]
+WantedBy=multi-user.target
