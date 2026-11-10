@@ -26,7 +26,7 @@ jobs:
           java-version: "21"
 
       # Also checks that the Gradle wrapper is a genuine one.
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
 
       # The runner provides the Android SDK (ANDROID_HOME); the private sound theme is not in the
       # repository, so the app builds with the Chimes theme only.
