@@ -6,8 +6,10 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.content.res.Configuration
 import android.os.Build
 import android.os.IBinder
+import android.os.LocaleList
 import android.os.PowerManager
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
@@ -35,8 +37,18 @@ class MonitorService : Service() {
     private lateinit var player: AlarmPlayer
     private lateinit var notificationManager: NotificationManager
     private var wakeLock: PowerManager.WakeLock? = null
+    private var locales: LocaleList? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
+
+    /** A new app language (settings) rewrites the persistent notification at once. */
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (newConfig.locales == locales) return
+        locales = newConfig.locales
+        val status = container.monitor.status.value
+        notificationManager.notify(Notifications.ID_MONITORING, Notifications.monitoring(this, status, container.profiles.value.active.name))
+    }
 
     // The wake lock is held for as long as monitoring runs: without it, polling and alarm
     // timers would stall while the phone sleeps. It is released in onDestroy.
@@ -46,6 +58,7 @@ class MonitorService : Service() {
         val monitor = container.monitor
         player = AlarmPlayer(this)
         notificationManager = getSystemService(NotificationManager::class.java)
+        locales = resources.configuration.locales
         ServiceCompat.startForeground(
             this,
             Notifications.ID_MONITORING,

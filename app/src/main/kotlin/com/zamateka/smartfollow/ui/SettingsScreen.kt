@@ -199,8 +199,8 @@ private fun SettingsRoot(
     var confirmingRestore by remember { mutableStateOf(false) }
     var choosingTheme by remember { mutableStateOf(false) }
     var choosingSnooze by remember { mutableStateOf(false) }
-    var choosingLanguage by remember { mutableStateOf(false) }
-    var showingAbout by remember { mutableStateOf(false) }
+    var choosingLanguage by rememberSaveable { mutableStateOf(false) }
+    var showingAbout by rememberSaveable { mutableStateOf(false) }
 
     if (choosingLanguage) LanguageDialog(onDismiss = { choosingLanguage = false })
     if (showingAbout) AboutDialog(settings.version, onDismiss = { showingAbout = false })
@@ -603,9 +603,9 @@ private const val AUTHOR = "Sébastien Lejeune"
 private const val FEEDBACK_EMAIL = "slejeune@zamateka.fr"
 private const val FEEDBACK_SUBJECT = "Feedback SmartFollow"
 
-/** About: version, author, a dedication and a button writing the author an e-mail. */
+/** About (settings and monitoring screen): version, author, a dedication and a feedback e-mail button. */
 @Composable
-private fun AboutDialog(version: String, onDismiss: () -> Unit) {
+fun AboutDialog(version: String, onDismiss: () -> Unit) {
     val context = LocalContext.current
     AlertDialog(
         onDismissRequest = onDismiss,
