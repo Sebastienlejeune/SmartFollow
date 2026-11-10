@@ -138,6 +138,11 @@
     <string name="settings_continuous_on">Rings without stopping until OK is pressed.</string>
     <string name="settings_continuous_off">Rings for a few seconds, then again after the repeat interval if still active.</string>
     <string name="about_title">About</string>
+    <string name="about_author">By %1$s</string>
+    <string name="about_quote">“Not all superheroes wear capes. Some have a sensor, an app and a bag of sweets.”</string>
+    <string name="about_dedication">For A.</string>
+    <string name="about_feedback">Send feedback</string>
+    <string name="about_no_mail_app">No e-mail app on this phone.</string>
     <string name="sign_out_confirm_title">Sign out?</string>
     <string name="sign_out_confirm_text">Monitoring stops and the Dexcom account is removed from this phone. No alarm will ring until you sign in again.</string>
     <string name="app_version" translatable="false">SmartFollow V%1$s</string>
@@ -248,6 +253,8 @@
     <string name="settings_snooze_sub">Low and low soon stay silent</string>
     <string name="settings_section_app">For the whole app</string>
     <string name="settings_section_app_sub">Does not depend on the profile.</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_system">System language</string>
     <string name="settings_server">Sharing server</string>
     <string name="settings_server_off">Not set: the app works on its own</string>
     <string name="settings_server_ok">Connected · last exchange %1$s</string>

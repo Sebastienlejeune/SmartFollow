@@ -170,13 +170,18 @@
       <section class="card"><h3 data-t="notifAlarms"></h3><div id="notifAlarms"></div></section>
       <section class="card"><h3 data-t="notifOther"></h3><div id="notifOther"></div></section>
       <p id="notifResult" class="small" style="margin: 0; color: var(--danger)"></p>
+      <section class="card"><h3 data-t="language"></h3><div id="language" class="segments"></div></section>
     </div>
   </div>
 </main>
 
 <script>
 "use strict";
-const FR = navigator.language.toLowerCase().startsWith("fr");
+// Language chosen on this phone (bell page), as the app's Language setting; none: the browser's.
+const LANGUAGE_KEY = "smartfollow-language";
+const LANGUAGES = { fr: "Français", en: "English" };
+const LANGUAGE = Object.hasOwn(LANGUAGES, safeGet(LANGUAGE_KEY)) ? safeGet(LANGUAGE_KEY) : null;
+const FR = (LANGUAGE ?? navigator.language.toLowerCase()).startsWith("fr");
 const LOCALE = FR ? "fr-FR" : "en-GB";
 const T = FR ? {
   loginTitle: "Connexion", loginHelp: "Collez le jeton d'accès du serveur SmartFollow.", loginButton: "Valider",
@@ -207,6 +212,7 @@ const T = FR ? {
   notifTitle: "Notifications",
   notifAlarms: "Alarmes", notifOther: "Autres", notifActions: "Resucrage ou annulation faits ailleurs", notifNight: "Résumé de la nuit",
   notifUrgentWarning: "Désactivée : aucune notification d'hypo sévère sur ce téléphone.", notifFailed: e => `Échec de l'enregistrement : ${e}`,
+  language: "Langue", languageSystem: "Langue du système",
 } : {
   loginTitle: "Sign in", loginHelp: "Paste the access token of the SmartFollow server.", loginButton: "OK",
   signOut: "Sign out", signOutConfirm: "Sign out? The token is removed from this phone; ntfy notifications go on.",
@@ -236,10 +242,23 @@ const T = FR ? {
   notifTitle: "Notifications",
   notifAlarms: "Alarms", notifOther: "Other", notifActions: "Resugaring or cancellation made elsewhere", notifNight: "Night summary",
   notifUrgentWarning: "Off: no urgent low notification on this phone.", notifFailed: e => `Saving failed: ${e}`,
+  language: "Language", languageSystem: "System language",
 };
 document.documentElement.lang = FR ? "fr" : "en";
 document.getElementById("openNotifications").setAttribute("aria-label", T.notifTitle);
 document.querySelectorAll("[data-t]").forEach(el => { el.textContent = T[el.dataset.t]; });
+// Language choice: saved on this phone, then the page reloads in the new language.
+[[null, T.languageSystem], ...Object.entries(LANGUAGES)].forEach(([code, name]) => {
+  const button = document.createElement("button");
+  button.textContent = name;
+  button.classList.toggle("active", code === LANGUAGE);
+  button.onclick = () => {
+    if (code === LANGUAGE) return;
+    safeSet(LANGUAGE_KEY, code);
+    location.reload();
+  };
+  document.getElementById("language").append(button);
+});
 
 const ARROWS = { DOUBLE_UP: "⇈", SINGLE_UP: "↑", FORTY_FIVE_UP: "↗", FLAT: "→", FORTY_FIVE_DOWN: "↘", SINGLE_DOWN: "↓", DOUBLE_DOWN: "⇊" };
 // Chart spans, point radii and minutes between two labelled clock times, as ChartRange in the app.

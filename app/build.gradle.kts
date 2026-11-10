@@ -12,8 +12,8 @@ android {
         applicationId = "com.zamateka.smartfollow"
         minSdk = 29
         targetSdk = 36
-        versionCode = 8
-        versionName = "0.8.0"
+        versionCode = 9
+        versionName = "0.8.1"
     }
 
     buildTypes {
@@ -29,6 +29,11 @@ android {
 
     buildFeatures {
         compose = true
+    }
+
+    // Lists the app languages (values, values-fr) for the per-app language of Android 13+.
+    androidResources {
+        generateLocaleConfig = true
     }
 
     // Private sound themes (files that cannot be published), ignored by git; see README.

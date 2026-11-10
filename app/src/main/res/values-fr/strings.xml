@@ -129,6 +129,11 @@
     <string name="settings_continuous_on">Sonne sans s\'arrêter jusqu\'à ce qu\'on appuie sur OK.</string>
     <string name="settings_continuous_off">Sonne quelques secondes, puis à nouveau après le délai de rappel si l\'alerte dure.</string>
     <string name="about_title">À propos</string>
+    <string name="about_author">Par %1$s</string>
+    <string name="about_quote">« Tous les super-héros n\'ont pas de cape. Certains ont un capteur, une appli et un paquet de bonbons. »</string>
+    <string name="about_dedication">Pour A.</string>
+    <string name="about_feedback">Envoyer un avis</string>
+    <string name="about_no_mail_app">Aucune app de messagerie sur ce téléphone.</string>
     <string name="sign_out_confirm_title">Se déconnecter ?</string>
     <string name="sign_out_confirm_text">La surveillance s\'arrête et le compte Dexcom est retiré de ce téléphone. Aucune alarme ne sonnera avant une nouvelle connexion.</string>
     <string name="tab_statistics">Statistiques</string>
@@ -238,6 +243,8 @@
     <string name="settings_snooze_sub">Hypo et hypo imminente se taisent</string>
     <string name="settings_section_app">Pour toute l\'app</string>
     <string name="settings_section_app_sub">Ne dépend pas du profil.</string>
+    <string name="settings_language">Langue</string>
+    <string name="settings_language_system">Langue du système</string>
     <string name="settings_server">Serveur de partage</string>
     <string name="settings_server_off">Non configuré : l\'app fonctionne seule</string>
     <string name="settings_server_ok">Connecté · dernier échange %1$s</string>

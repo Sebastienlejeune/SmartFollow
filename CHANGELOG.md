@@ -3,6 +3,20 @@
 Notable changes of SmartFollow. Versions follow [semantic versioning](https://semver.org/);
 in 0.x, a minor version may break compatibility.
 
+## 0.8.1 (2026-11-10)
+
+### Added
+
+- Language setting (system language, French or English), on Android 13 and later; the same
+  choice on the web page (bell page), kept in the browser. The ntfy notifications keep the
+  server's `SMARTFOLLOW_LANGUAGE`.
+- About window (settings): version, author, a dedication and a "Send feedback" button that
+  writes to the author.
+
+### Fixed
+
+- The settings stay open when the screen is recreated (rotation, language change).
+
 ## 0.8.0 (2026-11-09)
 
 First public version.
