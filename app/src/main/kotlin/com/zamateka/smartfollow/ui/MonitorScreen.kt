@@ -44,7 +44,6 @@ import com.zamateka.smartfollow.monitor.Monitor
 import kotlinx.coroutines.delay
 import java.text.DateFormat
 import java.util.Date
-import java.util.Locale
 
 /**
  * Alarms muted on this phone by the active profile, shown as a banner so that a muted profile
@@ -265,7 +264,7 @@ private fun CurrentGlucose(status: Monitor.Status, settings: AlarmSettings, nowM
         }
         status.evaluation?.rateMgDlPerMin?.let {
             Text(
-                stringResource(R.string.rate, String.format(Locale.getDefault(), "%+.1f", it)),
+                stringResource(R.string.rate, String.format(currentLocale(), "%+.1f", it)),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.outline,
             )
