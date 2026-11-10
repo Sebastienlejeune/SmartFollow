@@ -51,7 +51,6 @@ import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.time.LocalDate
 import java.util.Date
-import java.util.Locale
 
 private const val DAY_MILLIS = 24 * 60 * 60_000L
 
@@ -206,10 +205,10 @@ private fun GlucoseMetrics(stats: GlucoseStatistics) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(stringResource(R.string.stats_glucose), style = MaterialTheme.typography.titleMedium)
             MetricRow(stringResource(R.string.stats_mean), "${stats.meanMgDl.toInt()} mg/dL")
-            MetricRow(stringResource(R.string.stats_gmi), String.format(Locale.getDefault(), "%.1f %%", stats.gmiPercent))
+            MetricRow(stringResource(R.string.stats_gmi), String.format(currentLocale(), "%.1f %%", stats.gmiPercent))
             MetricRow(
                 stringResource(R.string.stats_cv),
-                String.format(Locale.getDefault(), "%.0f %%", stats.coefficientOfVariationPercent),
+                String.format(currentLocale(), "%.0f %%", stats.coefficientOfVariationPercent),
                 stringResource(R.string.target_cv),
             )
             MetricRow(stringResource(R.string.stats_sd), "${stats.standardDeviationMgDl.toInt()} mg/dL")
@@ -243,4 +242,5 @@ private fun MetricRow(label: String, value: String, hint: String? = null) {
     }
 }
 
-private fun percent(share: Double): String = String.format(Locale.getDefault(), "%.0f %%", share * 100)
+@Composable
+private fun percent(share: Double): String = String.format(currentLocale(), "%.0f %%", share * 100)

@@ -3,7 +3,9 @@ package com.zamateka.smartfollow.ui
 import android.content.Context
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import com.zamateka.smartfollow.R
 import com.zamateka.smartfollow.alarm.AlarmSettings
@@ -11,6 +13,12 @@ import com.zamateka.smartfollow.alarm.AlarmType
 import com.zamateka.smartfollow.model.GlucoseReading
 import com.zamateka.smartfollow.model.arrow
 import com.zamateka.smartfollow.share.DexcomShareException
+import java.util.Locale
+
+/** The app's locale, read so that a language change recomposes (unlike Locale.getDefault()). */
+@Composable
+@ReadOnlyComposable
+fun currentLocale(): Locale = LocalConfiguration.current.locales[0]
 
 fun glucoseText(context: Context, reading: GlucoseReading): String =
     context.getString(R.string.glucose_value, reading.mgDl, reading.trend.arrow()).trim()

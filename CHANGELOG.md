@@ -3,6 +3,19 @@
 Notable changes of SmartFollow. Versions follow [semantic versioning](https://semver.org/);
 in 0.x, a minor version may break compatibility.
 
+## 0.8.2 (2026-11-10)
+
+### Changed
+
+- Dependencies updated: Kotlin 2.4, Compose BOM 2026.09, AndroidX core 1.19, activity 1.13,
+  lifecycle 2.11, coroutines 1.11, serialization 1.12, Ktor 3.6, Logback 1.6, Android Gradle
+  plugin 9.5 and Gradle 9.9 (the app now compiles against Android 37; target unchanged);
+  GitHub Actions updated.
+
+### Fixed
+
+- Numbers on the Monitoring and Statistics screens follow a language change at once.
+
 ## 0.8.1 (2026-11-10)
 
 ### Added
