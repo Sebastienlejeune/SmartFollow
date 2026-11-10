@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.media.RingtoneManager
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -68,6 +69,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -80,6 +82,7 @@ import com.zamateka.smartfollow.alarm.AlarmSound
 import com.zamateka.smartfollow.alarm.AlarmSounds
 import com.zamateka.smartfollow.alarm.AlarmType
 import com.zamateka.smartfollow.alarm.SoundTheme
+import com.zamateka.smartfollow.settings.AppLanguage
 import com.zamateka.smartfollow.settings.ShareAccount
 import com.zamateka.smartfollow.share.ShareRegion
 import com.zamateka.smartfollow.sync.ActionSharing
@@ -196,7 +199,11 @@ private fun SettingsRoot(
     var confirmingRestore by remember { mutableStateOf(false) }
     var choosingTheme by remember { mutableStateOf(false) }
     var choosingSnooze by remember { mutableStateOf(false) }
+    var choosingLanguage by remember { mutableStateOf(false) }
+    var showingAbout by remember { mutableStateOf(false) }
 
+    if (choosingLanguage) LanguageDialog(onDismiss = { choosingLanguage = false })
+    if (showingAbout) AboutDialog(settings.version, onDismiss = { showingAbout = false })
     if (confirmingRestore) {
         val restoredMessage = stringResource(R.string.settings_restore_done, editedName)
         val undo = stringResource(R.string.undo)
@@ -329,6 +336,15 @@ private fun SettingsRoot(
                     )
                 },
             )
+            if (AppLanguage.isSupported()) {
+                SettingsRow(
+                    title = stringResource(R.string.settings_language),
+                    subtitle = AppLanguage.current(context)?.let { AppLanguage.NAMES[it] }
+                        ?: stringResource(R.string.settings_language_system),
+                    onClick = { choosingLanguage = true },
+                    leading = { Icon(painterResource(R.drawable.ic_language), contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
+                )
+            }
             settings.account?.let { account ->
                 SettingsRow(
                     title = stringResource(R.string.settings_account),
@@ -345,7 +361,8 @@ private fun SettingsRoot(
             SettingsRow(
                 title = stringResource(R.string.about_title),
                 subtitle = stringResource(R.string.app_version, settings.version),
-                leading = { Icon(Icons.Filled.Info, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
+                onClick = { showingAbout = true },
+                leading ={ Icon(Icons.Filled.Info, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
             )
         }
     }
@@ -579,6 +596,74 @@ private fun SnoozeDialog(preferences: AlarmPreferences, onChange: (AlarmPreferen
             }) { Text(stringResource(R.string.acknowledge)) }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
+    )
+}
+
+private const val AUTHOR = "Sébastien Lejeune"
+private const val FEEDBACK_EMAIL = "slejeune@zamateka.fr"
+private const val FEEDBACK_SUBJECT = "Feedback SmartFollow"
+
+/** About: version, author, a dedication and a button writing the author an e-mail. */
+@Composable
+private fun AboutDialog(version: String, onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.app_version, version)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Text(stringResource(R.string.about_author, AUTHOR), style = MaterialTheme.typography.bodyLarge)
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        stringResource(R.string.about_quote),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontStyle = FontStyle.Italic,
+                    )
+                    Text(
+                        stringResource(R.string.about_dedication),
+                        Modifier.align(Alignment.End),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                // Address and subject in the mailto URI (RFC 6068), and the subject as an extra
+                // too for the mail apps that only read extras.
+                val uri = "mailto:$FEEDBACK_EMAIL?subject=${Uri.encode(FEEDBACK_SUBJECT)}".toUri()
+                val intent = Intent(Intent.ACTION_SENDTO, uri).putExtra(Intent.EXTRA_SUBJECT, FEEDBACK_SUBJECT)
+                runCatching { context.startActivity(intent) }.onFailure {
+                    Toast.makeText(context, R.string.about_no_mail_app, Toast.LENGTH_LONG).show()
+                }
+            }) { Text(stringResource(R.string.about_feedback)) }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.close)) } },
+    )
+}
+
+/** Choice of the app language; applied at once (Android then recreates the screen). */
+@Composable
+private fun LanguageDialog(onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val current = AppLanguage.current(context)
+    val choose = { tag: String? ->
+        onDismiss()
+        if (tag != current) AppLanguage.set(context, tag)
+    }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.settings_language)) },
+        text = {
+            Column {
+                RadioLine(stringResource(R.string.settings_language_system), selected = current == null) { choose(null) }
+                AppLanguage.TAGS.forEach { tag ->
+                    RadioLine(AppLanguage.NAMES.getValue(tag), selected = current == tag) { choose(tag) }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
     )
 }
 

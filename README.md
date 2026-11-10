@@ -37,6 +37,7 @@ minutes until the glucose climbs back, and the whole family is awake. SmartFollo
 - **Night**: alarms ring lower at night, and a summary of the night arrives in the morning.
 - **Follow-up**: chart, history (one line per episode), statistics (time in range, GMI,
   variability) and CSV export.
+- **Languages**: English and French, following the phone or chosen in the settings.
 - **Private**: no analytics; the data stays on your phone and, if you want one, on your own
   server.
 

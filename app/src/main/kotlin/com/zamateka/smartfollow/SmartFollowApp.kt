@@ -2,6 +2,7 @@ package com.zamateka.smartfollow
 
 import android.app.Application
 import android.content.Context
+import android.content.res.Configuration
 import com.zamateka.smartfollow.alarm.AlarmPreferences
 import com.zamateka.smartfollow.alarm.AlarmProfile
 import com.zamateka.smartfollow.alarm.AlarmProfiles
@@ -32,6 +33,12 @@ class SmartFollowApp : Application() {
     override fun onCreate() {
         super.onCreate()
         container = AppContainer(this)
+        Notifications.createChannels(this)
+    }
+
+    /** A new app language (settings) renames the notification channels. */
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
         Notifications.createChannels(this)
     }
 }

@@ -70,7 +70,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             SmartFollowTheme {
                 var account by remember { mutableStateOf(settings.account) }
-                var showSettings by remember { mutableStateOf(false) }
+                var showSettings by rememberSaveable { mutableStateOf(false) }
                 val profiles by container.profiles.collectAsStateWithLifecycle()
                 // The profile shown by the settings: the active one each time they open.
                 var editedProfileId by rememberSaveable { mutableStateOf(profiles.activeId) }
