@@ -603,9 +603,9 @@ private const val AUTHOR = "Sébastien Lejeune"
 private const val FEEDBACK_EMAIL = "slejeune@zamateka.fr"
 private const val FEEDBACK_SUBJECT = "Feedback SmartFollow"
 
-/** About: version, author, a dedication and a button writing the author an e-mail. */
+/** About (settings and monitoring screen): version, author, a dedication and a feedback e-mail button. */
 @Composable
-private fun AboutDialog(version: String, onDismiss: () -> Unit) {
+fun AboutDialog(version: String, onDismiss: () -> Unit) {
     val context = LocalContext.current
     AlertDialog(
         onDismissRequest = onDismiss,

@@ -1,6 +1,7 @@
 package com.zamateka.smartfollow.ui
 
 import android.content.Intent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -29,9 +31,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zamateka.smartfollow.R
@@ -206,7 +210,17 @@ fun MonitorScreen(
             Text(stringResource(R.string.waiting_for_data), style = MaterialTheme.typography.bodySmall)
         }
 
-        Column(Modifier.fillMaxWidth().padding(top = 16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        var showingAbout by remember { mutableStateOf(false) }
+        if (showingAbout) AboutDialog(version, onDismiss = { showingAbout = false })
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .clickable(role = Role.Button) { showingAbout = true }
+                .padding(vertical = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             Text(stringResource(R.string.about_title), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.outline)
             Text(stringResource(R.string.app_version, version), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
         }

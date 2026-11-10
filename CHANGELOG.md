@@ -5,6 +5,10 @@ in 0.x, a minor version may break compatibility.
 
 ## 0.8.2 (2026-11-10)
 
+### Added
+
+- The About line at the bottom of the Monitoring screen opens the About window too.
+
 ### Changed
 
 - Dependencies updated: Kotlin 2.4, Compose BOM 2026.09, AndroidX core 1.19, activity 1.13,
