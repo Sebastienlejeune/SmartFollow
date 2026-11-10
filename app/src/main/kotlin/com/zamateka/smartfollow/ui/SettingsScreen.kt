@@ -199,8 +199,8 @@ private fun SettingsRoot(
     var confirmingRestore by remember { mutableStateOf(false) }
     var choosingTheme by remember { mutableStateOf(false) }
     var choosingSnooze by remember { mutableStateOf(false) }
-    var choosingLanguage by remember { mutableStateOf(false) }
-    var showingAbout by remember { mutableStateOf(false) }
+    var choosingLanguage by rememberSaveable { mutableStateOf(false) }
+    var showingAbout by rememberSaveable { mutableStateOf(false) }
 
     if (choosingLanguage) LanguageDialog(onDismiss = { choosingLanguage = false })
     if (showingAbout) AboutDialog(settings.version, onDismiss = { showingAbout = false })

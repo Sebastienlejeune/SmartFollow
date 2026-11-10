@@ -52,6 +52,7 @@
   button.primary { background: var(--accent); color: #fff; width: 100%; font-size: 20px; padding: 20px; }
   button.danger { background: var(--danger); color: #fff; }
   button.link { background: none; padding: 8px 4px; color: var(--muted); }
+  a.button { border-radius: 12px; padding: 12px 16px; background: var(--accent); color: #fff; text-decoration: none; }
   .row { display: flex; align-items: center; gap: 12px; }
   .row > span { flex: 1; }
   .buttons { display: flex; gap: 8px; }
@@ -148,6 +149,18 @@
       <p id="lastFetch" class="small muted" style="margin: 0"></p>
       <div class="buttons"><button id="refresh" data-t="refresh"></button></div>
       <p id="waiting" class="small" style="margin: 0" data-t="waiting" hidden></p>
+
+      <button class="link" id="openAbout" data-t="about" style="align-self: center"></button>
+      <section id="about" class="card" hidden>
+        <h3>SmartFollow</h3>
+        <p style="margin: 0 0 12px" id="aboutAuthor"></p>
+        <p style="margin: 0; font-style: italic" data-t="aboutQuote"></p>
+        <p class="muted" style="margin: 4px 0 12px; text-align: right" data-t="aboutDedication"></p>
+        <div class="buttons">
+          <a id="feedback" class="button" data-t="aboutFeedback"></a>
+          <button id="closeAbout" data-t="close"></button>
+        </div>
+      </section>
     </div>
 
     <div id="history" class="page" hidden>
@@ -180,7 +193,7 @@
 // Language chosen on this phone (bell page), as the app's Language setting; none: the browser's.
 const LANGUAGE_KEY = "smartfollow-language";
 const LANGUAGES = { fr: "Français", en: "English" };
-const LANGUAGE = Object.hasOwn(LANGUAGES, safeGet(LANGUAGE_KEY)) ? safeGet(LANGUAGE_KEY) : null;
+const LANGUAGE = ["fr", "en"].includes(safeGet(LANGUAGE_KEY)) ? safeGet(LANGUAGE_KEY) : null;
 const FR = (LANGUAGE ?? navigator.language.toLowerCase()).startsWith("fr");
 const LOCALE = FR ? "fr-FR" : "en-GB";
 const T = FR ? {
@@ -213,6 +226,8 @@ const T = FR ? {
   notifAlarms: "Alarmes", notifOther: "Autres", notifActions: "Resucrage ou annulation faits ailleurs", notifNight: "Résumé de la nuit",
   notifUrgentWarning: "Désactivée : aucune notification d'hypo sévère sur ce téléphone.", notifFailed: e => `Échec de l'enregistrement : ${e}`,
   language: "Langue", languageSystem: "Langue du système",
+  about: "À propos", aboutAuthor: a => `Par ${a}`, close: "Fermer", aboutFeedback: "Envoyer un avis", aboutDedication: "Pour A.",
+  aboutQuote: "« Tous les super-héros n'ont pas de cape. Certains ont un capteur, une appli et un paquet de bonbons. »",
 } : {
   loginTitle: "Sign in", loginHelp: "Paste the access token of the SmartFollow server.", loginButton: "OK",
   signOut: "Sign out", signOutConfirm: "Sign out? The token is removed from this phone; ntfy notifications go on.",
@@ -243,10 +258,19 @@ const T = FR ? {
   notifAlarms: "Alarms", notifOther: "Other", notifActions: "Resugaring or cancellation made elsewhere", notifNight: "Night summary",
   notifUrgentWarning: "Off: no urgent low notification on this phone.", notifFailed: e => `Saving failed: ${e}`,
   language: "Language", languageSystem: "System language",
+  about: "About", aboutAuthor: a => `By ${a}`, close: "Close", aboutFeedback: "Send feedback", aboutDedication: "For A.",
+  aboutQuote: "“Not all superheroes wear capes. Some have a sensor, an app and a bag of sweets.”",
 };
 document.documentElement.lang = FR ? "fr" : "en";
 document.getElementById("openNotifications").setAttribute("aria-label", T.notifTitle);
 document.querySelectorAll("[data-t]").forEach(el => { el.textContent = T[el.dataset.t]; });
+// About, as AboutDialog in the app: author, dedication and a feedback e-mail.
+const AUTHOR = "Sébastien Lejeune";
+document.getElementById("aboutAuthor").textContent = T.aboutAuthor(AUTHOR);
+document.getElementById("feedback").href = `mailto:slejeune@zamateka.fr?subject=${encodeURIComponent("Feedback SmartFollow")}`;
+const aboutCard = document.getElementById("about");
+document.getElementById("openAbout").onclick = () => { aboutCard.hidden = !aboutCard.hidden; };
+document.getElementById("closeAbout").onclick = () => { aboutCard.hidden = true; };
 // Language choice: saved on this phone, then the page reloads in the new language.
 [[null, T.languageSystem], ...Object.entries(LANGUAGES)].forEach(([code, name]) => {
   const button = document.createElement("button");

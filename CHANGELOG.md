@@ -3,11 +3,23 @@
 Notable changes of SmartFollow. Versions follow [semantic versioning](https://semver.org/);
 in 0.x, a minor version may break compatibility.
 
-## 0.8.2 (2026-11-10)
+## 1.0.0 (2026-11-10)
+
+First stable version.
 
 ### Added
 
 - The About line at the bottom of the Monitoring screen opens the About window too.
+- The web page has the same About section, at the bottom of its Monitoring tab.
+
+### Fixed
+
+- A language change rewrites the persistent notification at once, instead of at the next
+  reading; the notification channels are only renamed when the language changes.
+- The About and Language windows stay open when the screen rotates.
+- The web page no longer needs Safari 15.4 or later to read its language choice.
+
+## 0.8.2 (2026-11-10)
 
 ### Changed
 
@@ -15,10 +27,6 @@ in 0.x, a minor version may break compatibility.
   lifecycle 2.11, coroutines 1.11, serialization 1.12, Ktor 3.6, Logback 1.6, Android Gradle
   plugin 9.5 and Gradle 9.9 (the app now compiles against Android 37; target unchanged);
   GitHub Actions updated.
-
-### Fixed
-
-- Numbers on the Monitoring and Statistics screens follow a language change at once.
 
 ## 0.8.1 (2026-11-10)
 

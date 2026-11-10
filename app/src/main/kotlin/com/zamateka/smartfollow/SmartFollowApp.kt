@@ -3,6 +3,7 @@ package com.zamateka.smartfollow
 import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
+import android.os.LocaleList
 import com.zamateka.smartfollow.alarm.AlarmPreferences
 import com.zamateka.smartfollow.alarm.AlarmProfile
 import com.zamateka.smartfollow.alarm.AlarmProfiles
@@ -34,11 +35,16 @@ class SmartFollowApp : Application() {
         super.onCreate()
         container = AppContainer(this)
         Notifications.createChannels(this)
+        locales = resources.configuration.locales
     }
+
+    private var locales: LocaleList? = null
 
     /** A new app language (settings) renames the notification channels. */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        if (newConfig.locales == locales) return
+        locales = newConfig.locales
         Notifications.createChannels(this)
     }
 }

@@ -210,7 +210,7 @@ fun MonitorScreen(
             Text(stringResource(R.string.waiting_for_data), style = MaterialTheme.typography.bodySmall)
         }
 
-        var showingAbout by remember { mutableStateOf(false) }
+        var showingAbout by rememberSaveable { mutableStateOf(false) }
         if (showingAbout) AboutDialog(version, onDismiss = { showingAbout = false })
         Column(
             Modifier

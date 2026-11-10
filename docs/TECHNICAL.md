@@ -46,7 +46,7 @@ Dexcom Share ──► server ──ntfy──► iPhone (ntfy app + web page)
   behaviour: Monitoring (glucose, alarm banner with OK, chart with the same ranges, clock-time
   axis, threshold gutter and touch cursor, resugaring and snooze, last update, refresh),
   History (90 days, the last 7 grouped by foldable days, older ones by summed-up weeks) and
-  Statistics (same metrics and CSV export), plus language and sign out. The server keeps
+  Statistics (same metrics and CSV export), plus About, language and sign out. The server keeps
   the readings 90 days for it (`ReadingLogFile`). Only phone-specific features stay in the app:
   alarm sound and volume (muted alarms, their banner and the "Discreet" quick settings tile
   included), settings, Dexcom account, setup checks. Two tokens protect the API: the full one for the app
