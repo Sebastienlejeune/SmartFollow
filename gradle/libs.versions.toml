@@ -6,7 +6,7 @@ androidx-lifecycle = "2.11.0"
 compose-bom = "2026.09.00"
 kotlin = "2.4.21"
 kotlinx-coroutines = "1.11.0"
-kotlinx-serialization = "1.12.0"
+kotlinx-serialization = "1.13.0"
 ktor = "3.6.1"
 logback = "1.6.6"
 
